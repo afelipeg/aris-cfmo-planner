@@ -59,18 +59,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (event === 'SIGNED_IN' && session?.user) {
         console.log('✅ User signed in successfully:', session.user.email);
         
-        // Create or update user profile if needed
-        if (session.user.user_metadata?.full_name) {
-          try {
-            const { error } = await supabase.auth.updateUser({
-              data: {
-                full_name: session.user.user_metadata.full_name
-              }
+        // Ensure user profile exists in users table
+        try {
+          const { error } = await supabase
+            .from('users')
+            .upsert({
+              id: session.user.id,
+              email: session.user.email!,
+              full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name,
+              avatar_url: session.user.user_metadata?.avatar_url,
+              updated_at: new Date().toISOString()
+            }, {
+              onConflict: 'id'
             });
-            if (error) console.error('Error updating user metadata:', error);
-          } catch (error) {
-            console.error('Error updating user profile:', error);
+          
+          if (error) {
+            console.error('Error creating/updating user profile:', error);
+          } else {
+            console.log('✅ User profile created/updated successfully');
           }
+        } catch (error) {
+          console.error('Error with user profile:', error);
         }
       }
 
