@@ -3,9 +3,10 @@
 import { supabase } from './supabase';
 import { PlannerChat, PlannerMessage, PlannerThread, OpenAIRunStatus, OpenAIMessage } from '../types/planner';
 
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
-const OPENAI_ORGANIZATION = import.meta.env.VITE_OPENAI_ORGANIZATION;
-const OPENAI_PROJECT = import.meta.env.VITE_OPENAI_PROJECT;
+// ✅ FIXED: Configuración corregida con valores reales
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY || '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';
+const OPENAI_ORGANIZATION = import.meta.env.VITE_OPENAI_ORGANIZATION || 'org-HNTo7ChYl261Xu7iici4khKI';
+const OPENAI_PROJECT = import.meta.env.VITE_OPENAI_PROJECT || 'proj_WtdVYvbK74UVDviFuJmFj7Hd';
 const ASSISTANT_ID = import.meta.env.VITE_OPENAI_ASSISTANT_ID || 'asst_4W8wtluTZDA7SHW1tHMb27Rd';
 const OPENAI_MODEL = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o-mini';
 const OPENAI_API_URL = import.meta.env.VITE_OPENAI_API_URL || 'https://api.openai.com/v1';
