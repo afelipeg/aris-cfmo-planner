@@ -47,6 +47,7 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     if (user) {
       console.log('👤 User logged in, loading data for:', user.id);
+      console.log('🔍 FIXED: Users table should now exist, proceeding with data load...');
       loadChats();
       loadPlannerChats();
       checkApiConnection();

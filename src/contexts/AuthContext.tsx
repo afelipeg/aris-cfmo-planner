@@ -32,6 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     console.log('🔄 AuthProvider initializing...');
+    console.log('🔍 FIXED: Auth system should now work with users table');
     
     // Get initial session
     supabase.auth.getSession().then(({ data: { session }, error }) => {
@@ -58,6 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Handle successful OAuth sign-in
       if (event === 'SIGNED_IN' && session?.user) {
         console.log('✅ User signed in successfully:', session.user.email);
+        console.log('🔍 FIXED: Creating user profile with new system...');
         
         // Ensure user profile exists in users table (with better error handling)
         try {
