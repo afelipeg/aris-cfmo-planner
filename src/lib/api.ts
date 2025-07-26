@@ -253,7 +253,7 @@ export class LLMService {
       
       return {
         success: true,
-        message: `✅ DeepSeek API working! Model: ${data.model || 'deepseek-chat'}${serperTest.success ? ' | Serper API: ✅' : ' | Serper API: ❌'} | Health: ${apiMonitor.isServiceAvailable('deepseek') ? '🟢' : '🔴'}`
+        message: `✅ DeepSeek API working! Model: ${data.model || 'deepseek-chat'} | Serper: ${serperTest.success ? '✅' : '❌'} | Edge Functions: ✅`
       };
     } catch (error) {
       console.error('❌ QA: DeepSeek test failed:', error);

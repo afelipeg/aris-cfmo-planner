@@ -70,6 +70,8 @@ export class OpenAIService {
       this.validateConfig();
 
       console.log('🔍 Testing OpenAI connection with Assistant ID:', ASSISTANT_ID);
+      console.log('🏢 Using Organization:', OPENAI_ORGANIZATION);
+      console.log('📋 Using Project:', OPENAI_PROJECT);
 
       const response = await fetch(`${OPENAI_API_URL}/assistants/${ASSISTANT_ID}`, {
         headers: this.getHeaders()
@@ -82,7 +84,7 @@ export class OpenAIService {
         if (response.status === 401) {
           return {
             success: false,
-            message: `❌ OpenAI API Key inválida. Verifica tu VITE_OPENAI_API_KEY en .env`
+            message: `❌ OpenAI API Key inválida. Status: ${response.status}. Verifica configuración.`
           };
         }
         
@@ -103,7 +105,7 @@ export class OpenAIService {
       console.log('✅ OpenAI Assistant found:', assistant.name);
       return {
         success: true,
-        message: `✅ OpenAI Assistant connected: ${assistant.name || 'Planner Assistant'} (Model: ${assistant.model || OPENAI_MODEL})`
+        message: `✅ OpenAI gpt-4o-mini connected: ${assistant.name || 'Planner Assistant'} | Org: ${OPENAI_ORGANIZATION?.substring(0, 15)}... | Project: ${OPENAI_PROJECT?.substring(0, 15)}...`
       };
     } catch (error) {
       console.error('❌ OpenAI connection test failed:', error);
