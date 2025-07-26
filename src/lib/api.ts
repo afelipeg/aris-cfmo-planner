@@ -6,8 +6,8 @@ import { CIRCUIT_BREAKERS } from './circuitBreaker';
 import { apiMonitor } from './apiMonitor';
 
 // ✅ QA CHECK 1: CONFIGURACIÓN DE API VALIDADA
-const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
-const SERPER_API_KEY = import.meta.env.VITE_SERPER_API_KEY;
+const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-8d66744aba474bbc8b59399779a67295';
+const SERPER_API_KEY = import.meta.env.VITE_SERPER_API_KEY || '2a4ae59e3a06f8511231fc9a9fc8a5d66585d41e';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const DEEPSEEK_MODEL = 'deepseek-chat'; // Modelo estable verificado
 
@@ -187,7 +187,7 @@ export class LLMService {
     try {
       console.log('🧪 QA: Testing DeepSeek API connection...');
       
-      if (!DEEPSEEK_API_KEY || DEEPSEEK_API_KEY === 'your_deepseek_api_key_here') {
+      if (!DEEPSEEK_API_KEY || DEEPSEEK_API_KEY === 'your_deepseek_api_key_here' || DEEPSEEK_API_KEY === 'tu_deepseek_api_key_aqui') {
         return {
           success: false,
           message: '❌ DeepSeek API key not configured. Please check your .env file.'

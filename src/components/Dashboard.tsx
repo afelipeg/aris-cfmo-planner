@@ -84,6 +84,8 @@ export const Dashboard: React.FC = () => {
       } else if (activeView === 'planner') {
         const status = await openaiService.testConnection();
         setApiTestResult(status);
+      } else {
+        setApiTestResult({ success: true, message: 'Document analysis ready' });
       }
     } catch (error) {
       console.error('❌ Error checking API connection:', error);

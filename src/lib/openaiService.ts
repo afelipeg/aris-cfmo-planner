@@ -6,21 +6,21 @@ import { PlannerChat, PlannerMessage, PlannerThread, OpenAIRunStatus, OpenAIMess
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const OPENAI_ORGANIZATION = import.meta.env.VITE_OPENAI_ORGANIZATION;
 const OPENAI_PROJECT = import.meta.env.VITE_OPENAI_PROJECT;
-const ASSISTANT_ID = import.meta.env.VITE_OPENAI_ASSISTANT_ID;
+const ASSISTANT_ID = import.meta.env.VITE_OPENAI_ASSISTANT_ID || 'asst_4W8wtluTZDA7SHW1tHMb27Rd';
 const OPENAI_MODEL = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o-mini';
 const OPENAI_API_URL = import.meta.env.VITE_OPENAI_API_URL || 'https://api.openai.com/v1';
 
 export class OpenAIService {
   private static validateConfig() {
-    if (!OPENAI_API_KEY || OPENAI_API_KEY === 'your_openai_api_key_here') {
+    if (!OPENAI_API_KEY || OPENAI_API_KEY === 'your_openai_api_key_here' || OPENAI_API_KEY === 'tu_api_key_real_de_openai') {
       throw new Error('OpenAI API key not configured');
     }
     
-    if (!OPENAI_API_KEY.startsWith('sk-')) {
+    if (!OPENAI_API_KEY.startsWith('sk-proj-') && !OPENAI_API_KEY.startsWith('sk-')) {
       throw new Error('Invalid OpenAI API key format. Must start with "sk-"');
     }
     
-    if (!ASSISTANT_ID || ASSISTANT_ID === 'your_assistant_id_here') {
+    if (!ASSISTANT_ID || ASSISTANT_ID === 'your_assistant_id_here' || ASSISTANT_ID === 'tu_assistant_id_real') {
       throw new Error('OpenAI Assistant ID not configured');
     }
     
