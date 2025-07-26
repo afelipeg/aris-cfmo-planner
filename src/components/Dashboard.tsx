@@ -81,9 +81,11 @@ export const Dashboard: React.FC = () => {
       if (activeView === 'chat') {
         const status = await llmService.testDeepSeekMessage();
         setApiTestResult(status);
+        console.log('🧠 DeepSeek API Status:', status);
       } else if (activeView === 'planner') {
         const status = await openaiService.testConnection();
         setApiTestResult(status);
+        console.log('🤖 OpenAI API Status:', status);
       } else {
         setApiTestResult({ success: true, message: 'Document analysis ready' });
       }
