@@ -119,7 +119,7 @@ export const PlannerSidebar: React.FC<PlannerSidebarProps> = ({
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-gray-900 dark:text-white">Planner</h1>
-                  <p className="text-xs text-blue-600 dark:text-blue-400">OpenAI gpt-4o-mini</p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400">DeepSeek Reasoner</p>
                 </div>
               </div>
               <button
@@ -248,7 +248,7 @@ export const PlannerSidebar: React.FC<PlannerSidebarProps> = ({
                 <p className="text-xs text-blue-600 dark:text-blue-400 truncate">
                   {user?.email}
                 </p>
-                <p className="text-xs text-blue-500 dark:text-blue-500">gpt-4o-mini</p>
+                <p className="text-xs text-blue-500 dark:text-blue-500">DeepSeek Reasoner</p>
               </div>
             </div>
             

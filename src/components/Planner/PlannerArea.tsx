@@ -6,10 +6,9 @@ import { useSettings } from '../../contexts/SettingsContext';
 interface PlannerAreaProps {
   messages: PlannerMessage[];
   loading?: boolean;
-  runStatus?: string;
 }
 
-export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading, runStatus }) => {
+export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading }) => {
   const { t } = useSettings();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -21,7 +20,7 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading, run
     scrollToBottom();
   }, [messages, loading]);
 
-  console.log('📋 PlannerArea render - messages:', messages.length, 'loading:', loading, 'status:', runStatus);
+  console.log('📋 PlannerArea render - messages:', messages.length, 'loading:', loading);
 
   return (
     <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
@@ -35,7 +34,7 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading, run
               ¿Cómo puedo ayudarte a planificar?
             </h2>
             <p className="text-gray-600 dark:text-gray-400 max-w-md leading-relaxed">
-              Soy tu asistente de planificación estratégica con gpt-4o-mini. Puedes subir documentos y te ayudo a crear planes detallados y análisis profundos.
+              Soy tu asistente de planificación estratégica con DeepSeek Reasoner. Puedes subir documentos y te ayudo a crear planes detallados con razonamiento avanzado.
             </p>
           </div>
         ) : (
@@ -49,17 +48,9 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading, run
                   <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
                     <div className="animate-spin w-4 h-4 border-2 border-blue-300 border-t-blue-600 dark:border-blue-600 dark:border-t-blue-300 rounded-full" />
                     <span className="text-sm">
-                      {runStatus === 'queued' && 'En cola...'}
-                      {runStatus === 'in_progress' && 'Analizando y planificando...'}
-                      {runStatus === 'requires_action' && 'Procesando información...'}
-                      {!runStatus && 'Conectando con el asistente...'}
+                      DeepSeek Reasoner analizando y planificando...
                     </span>
                   </div>
-                  {runStatus && (
-                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                      Estado gpt-4o-mini: {runStatus}
-                    </p>
-                  )}
                 </div>
               </div>
             )}

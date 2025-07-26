@@ -135,15 +135,15 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
             </div>
             <div className="flex-1">
               <h3 className="font-medium text-white text-sm">
-                Asistente de Planificación (gpt-4o-mini)
+                Asistente de Planificación (DeepSeek Reasoner)
               </h3>
               <p className="text-white/80 text-xs">
-                Especialista en planificación estratégica
+                Especialista en planificación estratégica con razonamiento avanzado
               </p>
             </div>
             <div className="flex items-center gap-1">
               <CheckCircle size={14} className="text-green-300" />
-              <span className="text-xs text-white/80">OpenAI</span>
+              <span className="text-xs text-white/80">DeepSeek</span>
             </div>
           </div>
 
@@ -163,22 +163,11 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
                   </span>
                 </div>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                  Esta respuesta incluye análisis detallado de {message.attachments.length} documento{message.attachments.length > 1 ? 's' : ''} procesado{message.attachments.length > 1 ? 's' : ''} por OpenAI
+                  Esta respuesta incluye análisis detallado de {message.attachments.length} documento{message.attachments.length > 1 ? 's' : ''} procesado{message.attachments.length > 1 ? 's' : ''} por DeepSeek Reasoner
                 </p>
               </div>
             )}
 
-            {/* Thread and Run Info */}
-            {(message.thread_id || message.run_id) && (
-              <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2">
-                {message.thread_id && (
-                  <div>Thread: {message.thread_id.substring(0, 20)}...</div>
-                )}
-                {message.run_id && (
-                  <div>Run: {message.run_id.substring(0, 20)}...</div>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </div>
