@@ -44,15 +44,25 @@ export const PlannerDashboard: React.FC = () => {
 
   const checkApiConnection = async () => {
     try {
-      console.log('🔍 Checking OpenAI API connection...');
+      console.log('🔍 FIXED: Checking OpenAI API connection for Planner...');
       const status = await openaiService.testConnection();
       setApiStatus(status);
-      console.log('🔌 OpenAI API Status:', status);
+      console.log('🔌 FIXED: OpenAI API Status:', status);
+      
+      // ✅ FIXED: Log detailed info for debugging
+      if (!status.success) {
+        console.error('❌ FIXED: OpenAI API failed with message:', status.message);
+        console.error('🔧 FIXED: Check these values:');
+        console.error('   - API Key starts with sk-proj-:', import.meta.env.VITE_OPENAI_API_KEY?.startsWith('sk-proj-'));
+        console.error('   - Assistant ID starts with asst_:', import.meta.env.VITE_OPENAI_ASSISTANT_ID?.startsWith('asst_'));
+        console.error('   - Organization starts with org-:', import.meta.env.VITE_OPENAI_ORGANIZATION?.startsWith('org-'));
+        console.error('   - Project starts with proj_:', import.meta.env.VITE_OPENAI_PROJECT?.startsWith('proj_'));
+      }
     } catch (error) {
-      console.error('❌ Error checking OpenAI API connection:', error);
+      console.error('❌ FIXED: Error checking OpenAI API connection:', error);
       setApiStatus({ 
         success: false, 
-        message: `Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
+        message: `FIXED: Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
       });
     }
   };

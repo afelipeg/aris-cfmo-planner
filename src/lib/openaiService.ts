@@ -68,51 +68,77 @@ export class OpenAIService {
   // Test OpenAI connection
   static async testConnection(): Promise<{ success: boolean; message: string }> {
     try {
+      console.log('🔍 FIXED: Testing OpenAI connection...');
+      console.log('🔑 API Key:', OPENAI_API_KEY ? OPENAI_API_KEY.substring(0, 25) + '...' : 'NOT SET');
+      console.log('🤖 Assistant ID:', ASSISTANT_ID);
+      console.log('🏢 Organization:', OPENAI_ORGANIZATION);
+      console.log('📋 Project:', OPENAI_PROJECT);
+      
+      // ✅ FIXED: Validar después de logging
       this.validateConfig();
 
-      console.log('🔍 Testing OpenAI connection with Assistant ID:', ASSISTANT_ID);
-      console.log('🏢 Using Organization:', OPENAI_ORGANIZATION);
-      console.log('📋 Using Project:', OPENAI_PROJECT);
+      // ✅ FIXED: Test simple primero
+      console.log('🧪 Testing basic OpenAI API access...');
+      const basicResponse = await fetch(`${OPENAI_API_URL}/models`, {
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'OpenAI-Organization': OPENAI_ORGANIZATION,
+          'OpenAI-Project': OPENAI_PROJECT
+        }
+      });
+      
+      if (!basicResponse.ok) {
+        const basicError = await basicResponse.json().catch(() => ({}));
+        console.error('❌ Basic API test failed:', basicResponse.status, basicError);
+        return {
+          success: false,
+          message: `❌ OpenAI API access failed: ${basicResponse.status} - ${basicError.error?.message || 'Check API key, org, and project'}`
+        };
+      }
+      
+      console.log('✅ Basic OpenAI API access successful');
 
+      // ✅ FIXED: Test assistant específico
+      console.log('🤖 Testing Assistant access...');
       const response = await fetch(`${OPENAI_API_URL}/assistants/${ASSISTANT_ID}`, {
         headers: this.getHeaders()
       });
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        console.error('❌ OpenAI API Error:', response.status, error);
+        console.error('❌ FIXED: Assistant API Error:', response.status, error);
         
         if (response.status === 401) {
           return {
             success: false,
-            message: `❌ OpenAI API Key inválida. Status: ${response.status}. Verifica configuración.`
+            message: `❌ FIXED: OpenAI unauthorized. Check API key and organization access.`
           };
         }
         
         if (response.status === 404) {
           return {
             success: false,
-            message: `❌ Assistant no encontrado. Verifica tu VITE_OPENAI_ASSISTANT_ID: ${ASSISTANT_ID}`
+            message: `❌ FIXED: Assistant not found: ${ASSISTANT_ID}. Check if it exists in your OpenAI account.`
           };
         }
         
         return {
           success: false,
-          message: `OpenAI API Error ${response.status}: ${error.error?.message || response.statusText}`
+          message: `❌ FIXED: OpenAI API Error ${response.status}: ${error.error?.message || response.statusText}`
         };
       }
 
       const assistant = await response.json();
-      console.log('✅ OpenAI Assistant found:', assistant.name);
+      console.log('✅ FIXED: OpenAI Assistant found:', assistant.name, assistant.model);
       return {
         success: true,
-        message: `✅ OpenAI gpt-4o-mini connected: ${assistant.name || 'Planner Assistant'} | Org: ${OPENAI_ORGANIZATION?.substring(0, 15)}... | Project: ${OPENAI_PROJECT?.substring(0, 15)}...`
+        message: `✅ FIXED: OpenAI ${assistant.model || 'gpt-4o-mini'} connected: ${assistant.name || 'Assistant'} | Org: ${OPENAI_ORGANIZATION?.substring(0, 15)}... | Project: ${OPENAI_PROJECT?.substring(0, 15)}...`
       };
     } catch (error) {
-      console.error('❌ OpenAI connection test failed:', error);
+      console.error('❌ FIXED: OpenAI connection test failed:', error);
       return {
         success: false,
-        message: `OpenAI connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        message: `❌ FIXED: OpenAI connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       };
     }
   }
