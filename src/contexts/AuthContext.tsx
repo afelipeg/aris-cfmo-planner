@@ -59,9 +59,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (event === 'SIGNED_IN' && session?.user) {
         console.log('✅ User signed in successfully:', session.user.email);
         
-        // Ensure user profile exists in users table
+        // Ensure user profile exists in users table (with better error handling)
         try {
-          const { error } = await supabase
+          console.log('👤 Creating/updating user profile for:', session.user.id);
+          
+          const { data, error } = await supabase
             .from('users')
             .upsert({
               id: session.user.id,
@@ -71,15 +73,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               updated_at: new Date().toISOString()
             }, {
               onConflict: 'id'
-            });
+            })
+            .select();
           
           if (error) {
-            console.error('Error creating/updating user profile:', error);
+            console.error('❌ Error creating/updating user profile:', error);
+            // Don't throw error, just log it - allow user to continue
+            console.warn('⚠️ Continuing without user profile creation');
           } else {
-            console.log('✅ User profile created/updated successfully');
+            console.log('✅ User profile created/updated successfully:', data);
           }
         } catch (error) {
-          console.error('Error with user profile:', error);
+          console.error('❌ Exception with user profile:', error);
+          // Don't throw error, just log it - allow user to continue
+          console.warn('⚠️ Continuing despite user profile error');
         }
       }
 

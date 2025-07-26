@@ -54,19 +54,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setSuccess('');
     
     try {
+      console.log(`🔗 Starting ${provider} OAuth...`);
       setSuccess(`Redirecting to ${provider.charAt(0).toUpperCase() + provider.slice(1)}...`);
       
       switch (provider) {
         case 'google':
+          console.log('🔗 Calling signInWithGoogle...');
           await signInWithGoogle();
           break;
         case 'github':
+          console.log('🔗 Calling signInWithGithub...');
           await signInWithGithub();
           break;
       }
+      
+      console.log(`✅ ${provider} OAuth initiated successfully`);
     } catch (err) {
-      console.error(`${provider} OAuth error:`, err);
-      setError(err instanceof Error ? err.message : `${provider} authentication error`);
+      console.error(`❌ ${provider} OAuth error:`, err);
+      
+      // More specific error handling
+      let errorMessage = `${provider} authentication failed`;
+      if (err instanceof Error) {
+        if (err.message.includes('popup')) {
+          errorMessage = 'Popup blocked. Please allow popups and try again.';
+        } else if (err.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
       setOauthLoading(null);
     }
     // Note: Don't set loading to false here as the user will be redirected
