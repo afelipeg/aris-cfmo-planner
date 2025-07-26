@@ -78,22 +78,31 @@ export const Dashboard: React.FC = () => {
   const checkApiConnection = async () => {
     try {
       console.log('🔍 Checking API connections...');
+      console.log('🔍 DEBUGGING: Current view:', activeView);
+      console.log('🔍 DEBUGGING: Environment variables check:', {
+        hasOpenAI: !!import.meta.env.VITE_OPENAI_API_KEY,
+        hasDeepSeek: !!import.meta.env.VITE_DEEPSEEK_API_KEY,
+        hasSerper: !!import.meta.env.VITE_SERPER_API_KEY,
+        openAIPrefix: import.meta.env.VITE_OPENAI_API_KEY?.substring(0, 20) || 'NOT SET'
+      });
+      
       if (activeView === 'chat') {
         const status = await llmService.testDeepSeekMessage();
         setApiTestResult(status);
         console.log('🧠 DeepSeek API Status:', status);
       } else if (activeView === 'planner') {
+        console.log('🤖 DEBUGGING: Testing OpenAI connection for Planner...');
         const status = await openaiService.testConnection();
         setApiTestResult(status);
-        console.log('🤖 OpenAI API Status:', status);
+        console.log('🤖 DEBUGGING: OpenAI API Status:', status);
       } else {
         setApiTestResult({ success: true, message: 'Document analysis ready' });
       }
     } catch (error) {
-      console.error('❌ Error checking API connection:', error);
+      console.error('❌ DEBUGGING: Error checking API connection:', error);
       setApiTestResult({ 
         success: false, 
-        message: `Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
+        message: `DEBUGGING: Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
       });
     }
   };
