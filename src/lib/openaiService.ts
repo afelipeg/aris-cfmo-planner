@@ -3,7 +3,7 @@
 import { supabase } from './supabase';
 import { PlannerChat, PlannerMessage, PlannerThread, OpenAIRunStatus, OpenAIMessage } from '../types/planner';
 
-// ✅ FIXED: Configuración corregida con valores reales
+// ✅ FIXED: Configuración con valores hardcoded como fallback
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY || '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';
 const OPENAI_ORGANIZATION = import.meta.env.VITE_OPENAI_ORGANIZATION || 'org-HNTo7ChYl261Xu7iici4khKI';
 const OPENAI_PROJECT = import.meta.env.VITE_OPENAI_PROJECT || 'proj_WtdVYvbK74UVDviFuJmFj7Hd';
@@ -13,32 +13,54 @@ const OPENAI_API_URL = import.meta.env.VITE_OPENAI_API_URL || 'https://api.opena
 
 export class OpenAIService {
   private static validateConfig() {
-    if (!OPENAI_API_KEY || OPENAI_API_KEY === 'your_openai_api_key_here' || OPENAI_API_KEY === 'tu_api_key_real_de_openai') {
-      throw new Error('OpenAI API key not configured');
+    console.log('🔍 DEBUGGING: OpenAI Configuration Check:', {
+      hasApiKey: !!OPENAI_API_KEY,
+      apiKeyLength: OPENAI_API_KEY?.length || 0,
+      apiKeyPrefix: OPENAI_API_KEY?.substring(0, 20) || 'NONE',
+      hasAssistantId: !!ASSISTANT_ID,
+      assistantId: ASSISTANT_ID,
+      hasOrganization: !!OPENAI_ORGANIZATION,
+      organization: OPENAI_ORGANIZATION,
+      hasProject: !!OPENAI_PROJECT,
+      project: OPENAI_PROJECT,
+      envVars: {
+        VITE_OPENAI_API_KEY: import.meta.env.VITE_OPENAI_API_KEY ? 'SET' : 'NOT SET',
+        VITE_OPENAI_ASSISTANT_ID: import.meta.env.VITE_OPENAI_ASSISTANT_ID ? 'SET' : 'NOT SET',
+        VITE_OPENAI_ORGANIZATION: import.meta.env.VITE_OPENAI_ORGANIZATION ? 'SET' : 'NOT SET',
+        VITE_OPENAI_PROJECT: import.meta.env.VITE_OPENAI_PROJECT ? 'SET' : 'NOT SET'
+      }
+    });
+    
+    if (!OPENAI_API_KEY || OPENAI_API_KEY.length < 50) {
+      console.error('❌ DEBUGGING: OpenAI API key validation failed');
+      throw new Error('OpenAI API key not configured properly');
     }
     
-    if (!OPENAI_API_KEY.startsWith('sk-proj-') && !OPENAI_API_KEY.startsWith('sk-')) {
-      throw new Error('Invalid OpenAI API key format. Must start with "sk-"');
+    if (!OPENAI_API_KEY.startsWith('sk-')) {
+      console.error('❌ DEBUGGING: OpenAI API key format invalid');
+      throw new Error('Invalid OpenAI API key format');
     }
     
-    if (!ASSISTANT_ID || ASSISTANT_ID === 'your_assistant_id_here' || ASSISTANT_ID === 'tu_assistant_id_real') {
-      throw new Error('OpenAI Assistant ID not configured');
+    if (!ASSISTANT_ID || ASSISTANT_ID.length < 20) {
+      console.error('❌ DEBUGGING: Assistant ID validation failed');
+      throw new Error('OpenAI Assistant ID not configured properly');
     }
     
     if (!ASSISTANT_ID.startsWith('asst_')) {
-      throw new Error('Invalid OpenAI Assistant ID format. Must start with "asst_"');
+      console.error('❌ DEBUGGING: Assistant ID format invalid');
+      throw new Error('Invalid OpenAI Assistant ID format');
     }
     
-    console.log('✅ OpenAI Configuration validated:', {
+    console.log('✅ DEBUGGING: OpenAI Configuration validated successfully:', {
       hasApiKey: !!OPENAI_API_KEY,
       hasAssistantId: !!ASSISTANT_ID,
       hasOrganization: !!OPENAI_ORGANIZATION,
       hasProject: !!OPENAI_PROJECT,
       model: OPENAI_MODEL,
-      apiKeyPrefix: OPENAI_API_KEY ? OPENAI_API_KEY.substring(0, 20) + '...' : 'Not set',
-      assistantIdPrefix: ASSISTANT_ID ? ASSISTANT_ID.substring(0, 15) + '...' : 'Not set',
-      organization: OPENAI_ORGANIZATION || 'Not set',
-      project: OPENAI_PROJECT || 'Not set'
+      apiKeyPrefix: OPENAI_API_KEY.substring(0, 25) + '...',
+      assistantId: ASSISTANT_ID,
+      organization: OPENAI_ORGANIZATION,
+      project: OPENAI_PROJECT
     });
   }
   
