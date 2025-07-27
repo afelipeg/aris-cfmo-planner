@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, TestTube, AlertTriangle, Activity } from 'lucide-react';
+import { Menu, TestTube, AlertTriangle, Activity, Brain } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Chat, Message, Agent, AGENTS } from '../types';
 import { PlannerChat, PlannerMessage } from '../types/planner';
@@ -12,7 +12,7 @@ import { AppSidebar } from './AppSidebar';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from './ui/sidebar';
 import { llmService } from '../lib/api';
 import { FileProcessor } from '../lib/fileProcessor';
-import { openaiService } from '../lib/openaiService';
+import { deepseekService } from '../lib/deepseekService';
 import { supabase } from '../lib/supabase';
 
 type DashboardView = 'chat' | 'documents' | 'planner';
@@ -35,9 +35,7 @@ export const Dashboard: React.FC = () => {
   const [activePlannerChat, setActivePlannerChat] = useState<PlannerChat | null>(null);
   const [plannerMessages, setPlannerMessages] = useState<PlannerMessage[]>([]);
   const [plannerLoading, setPlannerLoading] = useState(false);
-  const [plannerRunStatus, setPlannerRunStatus] = useState<string>('');
   const [plannerAbortController, setPlannerAbortController] = useState<AbortController | null>(null);
-  const [currentThread, setCurrentThread] = useState<any>(null);
   
   // API testing states
   const [testingApi, setTestingApi] = useState(false);
@@ -69,10 +67,8 @@ export const Dashboard: React.FC = () => {
     if (activePlannerChat) {
       console.log('📋 Loading planner messages for chat:', activePlannerChat.id);
       loadPlannerMessages(activePlannerChat.id);
-      loadThread(activePlannerChat.id);
     } else {
       setPlannerMessages([]);
-      setCurrentThread(null);
     }
   }, [activePlannerChat]);
 
@@ -92,10 +88,10 @@ export const Dashboard: React.FC = () => {
         setApiTestResult(status);
         console.log('🧠 DeepSeek API Status:', status);
       } else if (activeView === 'planner') {
-        console.log('🤖 DEBUGGING: Testing OpenAI connection for Planner...');
-        const status = await openaiService.testConnection();
+        console.log('🧠 Testing DeepSeek Reasoner connection for Planner...');
+        const status = await deepseekService.testConnection();
         setApiTestResult(status);
-        console.log('🤖 DEBUGGING: OpenAI API Status:', status);
+        console.log('🧠 DeepSeek Reasoner API Status:', status);
       } else {
         setApiTestResult({ success: true, message: 'Document analysis ready' });
       }
@@ -118,7 +114,7 @@ export const Dashboard: React.FC = () => {
       if (activeView === 'chat') {
         result = await llmService.testDeepSeekMessage();
       } else if (activeView === 'planner') {
-        result = await openaiService.testConnection();
+        result = await deepseekService.testConnection();
       } else {
         result = { success: true, message: 'Document analysis ready' };
       }
@@ -495,28 +491,6 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const loadThread = async (chatId: string) => {
-    try {
-      console.log('🧵 Loading thread for chat:', chatId);
-      const { data, error } = await supabase
-        .from('planner_threads')
-        .select('*')
-        .eq('chat_id', chatId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') { // Not found is OK
-        console.error('❌ Error loading thread:', error);
-        throw error;
-      }
-      
-      setCurrentThread(data || null);
-      console.log('✅ Thread loaded:', data?.thread_id || 'none');
-    } catch (error) {
-      console.error('❌ Failed to load thread:', error);
-      setCurrentThread(null);
-    }
-  };
-
   const createNewPlannerChat = async () => {
     if (!user) {
       console.log('❌ No user, cannot create planner chat');
@@ -547,7 +521,6 @@ export const Dashboard: React.FC = () => {
       setPlannerChats(prev => [newChat, ...prev]);
       setActivePlannerChat(newChat);
       setPlannerMessages([]);
-      setCurrentThread(null);
       
       return newChat;
     } catch (error) {
@@ -574,7 +547,6 @@ export const Dashboard: React.FC = () => {
       if (activePlannerChat?.id === chatId) {
         setActivePlannerChat(null);
         setPlannerMessages([]);
-        setCurrentThread(null);
       }
       
       console.log('✅ Planner chat deleted successfully');
@@ -616,14 +588,12 @@ export const Dashboard: React.FC = () => {
     console.log('🚀 Sending planner message:', {
       content: content.substring(0, 50) + '...',
       fileCount: files.length,
-      hasThread: !!currentThread
     });
 
     // Create AbortController for cancellation
     const controller = new AbortController();
     setPlannerAbortController(controller);
     setPlannerLoading(true);
-    setPlannerRunStatus('');
 
     try {
       // Create chat if none exists
@@ -636,53 +606,17 @@ export const Dashboard: React.FC = () => {
         }
       }
 
-      // Create or get thread
-      let threadId = currentThread?.thread_id;
-      if (!threadId) {
-        console.log('🧵 Creating new OpenAI thread...');
-        try {
-          threadId = await openaiService.createThread();
-          console.log('✅ OpenAI thread created:', threadId);
-        } catch (error) {
-          console.error('❌ Failed to create OpenAI thread:', error);
-          throw new Error(`Failed to create OpenAI thread: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        }
-        
-        // Save thread to database
-        try {
-          const { data: threadData, error: threadError } = await supabase
-            .from('planner_threads')
-            .insert([{
-              chat_id: currentChat.id,
-              thread_id: threadId,
-              assistant_id: import.meta.env.VITE_OPENAI_ASSISTANT_ID || 'default',
-              metadata: {}
-            }])
-            .select()
-            .single();
-
-          if (threadError) {
-            console.error('❌ Error saving thread to database:', threadError);
-            // Don't throw here, continue with the thread even if DB save fails
-            console.warn('⚠️ Continuing without saving thread to database');
-          } else {
-            setCurrentThread(threadData);
-            console.log('✅ Thread saved to database:', threadData.id);
-          }
-        } catch (dbError) {
-          console.error('❌ Database error when saving thread:', dbError);
-          console.warn('⚠️ Continuing without saving thread to database');
-        }
-      }
-
-      console.log('🧵 Using thread ID:', threadId);
+      // Get conversation history for context
+      const conversationHistory = plannerMessages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
 
       // Save user message to database
       const userMessageData = {
         chat_id: currentChat.id,
         content,
         role: 'user' as const,
-        thread_id: threadId,
         attachments: files.map((file, index) => ({
           id: `attachment-${Date.now()}-${index}`,
           name: file.name,
@@ -722,25 +656,13 @@ export const Dashboard: React.FC = () => {
       // Add user message to UI immediately
       setPlannerMessages(prev => [...prev, savedUserMessage]);
 
-      // Send message to OpenAI and get response
-      console.log('🤖 Sending message to OpenAI Assistant...');
-      let assistantResponse;
-      try {
-        assistantResponse = await openaiService.sendMessageAndGetResponse(
-          threadId,
-          content,
-          files,
-          (status) => {
-            console.log('📊 Run status update:', status);
-            setPlannerRunStatus(status);
-          },
-          controller.signal
-        );
-        console.log('✅ Assistant response received from OpenAI');
-      } catch (openaiError) {
-        console.error('❌ OpenAI API error:', openaiError);
-        throw new Error(`OpenAI API failed: ${openaiError instanceof Error ? openaiError.message : 'Unknown error'}`);
-      }
+      // Send message to DeepSeek Reasoner
+      console.log('🧠 Sending message to DeepSeek Reasoner...');
+      const response = await deepseekService.sendPlannerMessage({
+        message: content,
+        files,
+        conversationHistory
+      }, controller.signal);
 
       // Check if aborted
       if (controller.signal.aborted) {
@@ -748,13 +670,17 @@ export const Dashboard: React.FC = () => {
         return;
       }
 
+      if (!response.success) {
+        throw new Error(response.error || 'DeepSeek Reasoner failed');
+      }
+
+      console.log('✅ DeepSeek Reasoner response received');
 
       // Save assistant message to database
       const assistantMessageData = {
         chat_id: currentChat.id,
-        content: assistantResponse,
-        role: 'assistant' as const,
-        thread_id: threadId
+        content: response.content || 'No response content',
+        role: 'assistant' as const
       };
 
       let savedAssistantMessage;
@@ -828,14 +754,13 @@ export const Dashboard: React.FC = () => {
       const errorMessage: PlannerMessage = {
         id: `error-${Date.now()}`,
         chat_id: activePlannerChat?.id || 'temp',
-        content: `❌ Error en Planner: ${error instanceof Error ? error.message : 'Error desconocido'}. Verifica tu configuración de OpenAI API.`,
+        content: `❌ Error en Planner: ${error instanceof Error ? error.message : 'Error desconocido'}. Verifica tu configuración de DeepSeek API.`,
         role: 'assistant',
         created_at: new Date().toISOString()
       };
       setPlannerMessages(prev => [...prev, errorMessage]);
     } finally {
       setPlannerLoading(false);
-      setPlannerRunStatus('');
       setPlannerAbortController(null);
     }
   };
@@ -845,14 +770,13 @@ export const Dashboard: React.FC = () => {
       console.log('🛑 User requested to stop planner analysis');
       plannerAbortController.abort();
       setPlannerLoading(false);
-      setPlannerRunStatus('');
       setPlannerAbortController(null);
 
       // Add stopped message to chat
       const stoppedMessage: PlannerMessage = {
         id: `stopped-${Date.now()}`,
         chat_id: activePlannerChat?.id || 'temp',
-        content: '🛑 Análisis detenido por el usuario. El asistente de planificación ha sido interrumpido. Puedes enviar un nuevo mensaje o intentar de nuevo.',
+        content: '🛑 Análisis detenido por el usuario. DeepSeek Reasoner ha sido interrumpido. Puedes enviar un nuevo mensaje o intentar de nuevo.',
         role: 'assistant',
         created_at: new Date().toISOString()
       };
@@ -948,7 +872,7 @@ export const Dashboard: React.FC = () => {
                       {activePlannerChat.title}
                     </h2>
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-300">
-                      📋 OpenAI Assistant
+                      🧠 DeepSeek Reasoner
                     </span>
                   </div>
                 )}
@@ -972,10 +896,10 @@ export const Dashboard: React.FC = () => {
                     onClick={testAPI}
                     disabled={testingApi}
                     className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
-                    title={`Test ${activeView === 'chat' ? 'DeepSeek' : 'OpenAI gpt-4o-mini'} API`}
+                    title={`Test ${activeView === 'chat' ? 'DeepSeek' : 'DeepSeek Reasoner'} API`}
                   >
-                    <TestTube size={16} className={testingApi ? 'animate-spin' : ''} />
-                    {testingApi ? 'Testing...' : (activeView === 'chat' ? 'Test DeepSeek' : 'Test gpt-4o-mini')}
+                    <Brain size={16} className={testingApi ? 'animate-spin' : ''} />
+                    {testingApi ? 'Testing...' : (activeView === 'chat' ? 'Test DeepSeek' : 'Test Reasoner')}
                   </button>
                 </div>
               )}
@@ -988,7 +912,7 @@ export const Dashboard: React.FC = () => {
                   <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-amber-800 dark:text-amber-400">
-                      ⚠️ {activeView === 'chat' ? 'DeepSeek' : 'OpenAI'} API no configurado correctamente
+                      ⚠️ DeepSeek API no configurado correctamente
                     </p>
                     <p className="text-xs text-amber-700 dark:text-amber-400">
                       {apiTestResult.message}
@@ -1029,7 +953,6 @@ export const Dashboard: React.FC = () => {
                   <PlannerArea 
                     messages={plannerMessages} 
                     loading={plannerLoading} 
-                    runStatus={plannerRunStatus} 
                   />
                   <PlannerInput 
                     onSendMessage={handleSendPlannerMessage} 
