@@ -494,7 +494,7 @@ export const Dashboard: React.FC = () => {
         .from('planner_chats')
         .insert([
           {
-            title: 'Nuevo Plan',
+            title: 'Nuevo Plan de Medios',
             user_id: user.id,
           }
         ])
@@ -576,7 +576,7 @@ export const Dashboard: React.FC = () => {
   };
 
   const handleSendPlannerMessage = async (content: string, files: File[]) => {
-    console.log('🚀 Sending planner message:', {
+    console.log('🚀 Sending planner message to DeepSeek Reasoner:', {
       content: content.substring(0, 50) + '...',
       fileCount: files.length,
     });
@@ -632,8 +632,8 @@ export const Dashboard: React.FC = () => {
         content: msg.content
       }));
 
-      // Send message to DeepSeek
-      console.log('🧠 Sending message to DeepSeek Media Planner...');
+      // Send message to DeepSeek Reasoner
+      console.log('🧠 Sending message to DeepSeek Reasoner Media Planner...');
       const response = await deepseekService.sendPlannerMessage({
         message: content,
         files,
@@ -647,10 +647,10 @@ export const Dashboard: React.FC = () => {
       }
 
       if (!response.success) {
-        throw new Error(response.error || 'DeepSeek Media Planner failed');
+        throw new Error(response.error || 'DeepSeek Reasoner failed');
       }
 
-      console.log('✅ DeepSeek response received');
+      console.log('✅ DeepSeek Reasoner response received');
 
       // Save assistant message to database
       const assistantMessageData = {
@@ -690,7 +690,7 @@ export const Dashboard: React.FC = () => {
       console.log('🔄 Refreshing planner chats list...');
       await loadPlannerChats();
 
-      console.log('🎉 Planner message process completed successfully with DeepSeek');
+      console.log('🎉 Planner message process completed successfully with DeepSeek Reasoner');
       
     } catch (error) {
       console.error('❌ Error in planner handleSendMessage:', error);
@@ -817,7 +817,7 @@ export const Dashboard: React.FC = () => {
                       {activePlannerChat.title}
                     </h2>
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-300">
-                      📊 Media Planner • DeepSeek
+                      📊 DeepSeek Reasoner
                     </span>
                   </div>
                 )}

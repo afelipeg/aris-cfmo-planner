@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { PlannerMessage } from '../../types/planner';
 import { PlannerMessageBubble } from './PlannerMessageBubble';
-import { useSettings } from '../../contexts/SettingsContext';
 
 interface PlannerAreaProps {
   messages: PlannerMessage[];
@@ -9,7 +8,6 @@ interface PlannerAreaProps {
 }
 
 export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading }) => {
-  const { t } = useSettings();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -28,14 +26,28 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading }) =
         {messages.length === 0 && !loading ? (
           <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
             <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-8 shadow-lg">
-              <span className="text-2xl">📋</span>
+              <span className="text-2xl">📊</span>
             </div>
             <h2 className="text-xl font-medium text-gray-900 dark:text-white mb-3">
-              Media Planner
+              Planificador de Medios Multiplataforma
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-md leading-relaxed">
-              Planificador de Medios Multiplataforma especializado en Google Ads, DV360, Meta, SA360 y otros DSP. Diseña campañas optimizadas con DeepSeek Reasoner para maximizar tu KPI dentro del presupuesto.
+            <p className="text-gray-600 dark:text-gray-400 max-w-md leading-relaxed mb-4">
+              Especialista en Google Ads, DV360, Meta, SA360 y otros DSP. Diseña campañas optimizadas con DeepSeek Reasoner para maximizar tu KPI dentro del presupuesto.
             </p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 max-w-lg">
+              <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
+                📋 Brief Template:
+              </h3>
+              <div className="text-xs text-blue-700 dark:text-blue-400 space-y-1">
+                <p>• Marca/Cliente: [nombre]</p>
+                <p>• País(es): [códigos ISO]</p>
+                <p>• Fechas: [YYYY-MM-DD a YYYY-MM-DD]</p>
+                <p>• Presupuesto total (USD): [número]</p>
+                <p>• Objetivo primario: [Awareness/Leads/Sales/ROAS]</p>
+                <p>• Audiencias: [1P/LAL/3P disponibles]</p>
+                <p>• Canales: [requeridos/prohibidos]</p>
+              </div>
+            </div>
           </div>
         ) : (
           <>
@@ -48,7 +60,7 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading }) =
                   <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
                     <div className="animate-spin w-4 h-4 border-2 border-blue-300 border-t-blue-600 dark:border-blue-600 dark:border-t-blue-300 rounded-full" />
                     <span className="text-sm">
-                      DeepSeek creando plan de medios optimizado...
+                      🧠 DeepSeek Reasoner creando plan de medios optimizado...
                     </span>
                   </div>
                 </div>
