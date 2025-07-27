@@ -11,11 +11,10 @@ A sophisticated business intelligence platform powered by specialized AI agents 
 - **Password Reset**: Email-based password recovery
 
 ### 🤖 AI Agents
-- **Strategic Planning**: Competitive analysis, growth loops, pricing strategy
-- **Zero-Based Growth**: Business transformation and portfolio optimization
-- **CRM & Growth Loops**: Customer lifecycle and viral growth optimization
-- **Research & Intelligence**: Multi-source research and executive insights
-- **Brand Power**: Kantar methodology and price premium optimization
+- **CFMO Multi-Agent System**: 5 specialized business consultants powered by DeepSeek Reasoner
+  - Strategic Planning, Zero-Based Growth, CRM & Growth Loops, Research & Intelligence, Brand Power
+- **Strategic Planner**: Advanced planning assistant using DeepSeek Reasoner for deep analysis
+- **Document Analysis**: AI-powered document processing and business intelligence
 
 ### 📁 File Analysis
 - **Document Upload**: Support for PDF, Word, Excel, CSV, JSON, images
@@ -44,8 +43,9 @@ A sophisticated business intelligence platform powered by specialized AI agents 
 - **Frontend**: React 18, TypeScript, Tailwind CSS
 - **Authentication**: Supabase Auth with OAuth2
 - **Database**: PostgreSQL with Supabase
-- **AI Integration**: OpenAI GPT-4, Anthropic Claude
-- **File Processing**: Browser-based file analysis
+- **AI Integration**: DeepSeek Reasoner for all AI functionality
+- **Web Search**: Serper.dev for real-time market intelligence
+- **File Processing**: Advanced browser-based document analysis
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
 
@@ -60,13 +60,12 @@ Create a `.env` file with the following variables:
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# OpenAI API Configuration
-VITE_OPENAI_API_KEY=your_openai_api_key
-VITE_OPENAI_API_URL=https://api.openai.com/v1
+# DeepSeek API Configuration
+VITE_DEEPSEEK_API_KEY=your_deepseek_api_key
+VITE_DEEPSEEK_API_URL=https://api.deepseek.com/v1
 
-# Anthropic API Configuration (Optional)
-VITE_ANTHROPIC_API_KEY=your_anthropic_api_key
-VITE_ANTHROPIC_API_URL=https://api.anthropic.com/v1
+# Serper API Configuration (for web search)
+VITE_SERPER_API_KEY=your_serper_api_key
 
 # App Configuration
 VITE_APP_NAME=Talos
