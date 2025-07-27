@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Handle successful OAuth sign-in
       if (event === 'SIGNED_IN' && session?.user) {
         console.log('✅ User signed in successfully:', session.user.email);
-        console.log('🔍 FIXED: Creating user profile with new system...');
+        console.log('🔍 Creating user profile with updated schema...');
         
         // Ensure user profile exists in users table (with better error handling)
         try {
@@ -84,7 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Don't throw error, just log it - allow user to continue
             console.warn('⚠️ Continuing without user profile creation');
           } else {
-            console.log('✅ User profile created/updated successfully:', data || 'No data returned');
+            console.log('✅ User profile created/updated with new schema:', data || 'No data returned');
           }
         } catch (error) {
           console.error('❌ Exception with user profile:', error);

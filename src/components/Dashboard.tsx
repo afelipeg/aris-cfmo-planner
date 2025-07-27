@@ -618,13 +618,13 @@ export const Dashboard: React.FC = () => {
         chat_id: currentChat.id,
         content: content,
         role: 'user' as const,
-        attachments: files.map((file, index) => ({
+        attachments: files.length > 0 ? files.map((file, index) => ({
           id: `attachment-${Date.now()}-${index}`,
           name: file.name,
           type: file.type,
           size: file.size,
           url: URL.createObjectURL(file)
-        }))
+        })) : []
       };
 
       const { data: savedUserMessage, error: userMessageError } = await supabase
