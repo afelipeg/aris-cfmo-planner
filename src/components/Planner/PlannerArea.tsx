@@ -34,7 +34,7 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading }) =
               Media Planner
             </h2>
             <p className="text-gray-600 dark:text-gray-400 max-w-md leading-relaxed">
-              Specialist in Google Ads, DV360, Meta, SA360. Design optimized campaigns with DeepSeek to maximize your KPI within budget.
+              Planificador de Medios Multiplataforma especializado en Google Ads, DV360, Meta, SA360 y otros DSP. Diseña campañas optimizadas con DeepSeek Reasoner para maximizar tu KPI dentro del presupuesto.
             </p>
           </div>
         ) : (

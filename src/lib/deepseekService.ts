@@ -1,4 +1,4 @@
-// src/lib/deepseekService.ts - Servicio DeepSeek Reasoner para Planificador de Medios
+// src/lib/deepseekService.ts - Servicio DeepSeek Reasoner para Planificador de Medios Multiplataforma
 export interface DeepSeekResponse {
   success: boolean;
   content?: string;
@@ -93,7 +93,7 @@ export class DeepSeekService {
       const messages = [
         {
           role: 'system',
-          content: this.getMediaPlannerSystemPrompt()
+          content: this.getCompleteMediaPlannerSystemPrompt()
         }
       ];
 
@@ -119,7 +119,7 @@ export class DeepSeekService {
 
       // Call DeepSeek Reasoner
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout for complex planning
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout for complex planning
       
       if (signal) {
         signal.addEventListener('abort', () => controller.abort());
@@ -135,7 +135,7 @@ export class DeepSeekService {
         body: JSON.stringify({
           model: this.MODEL,
           messages,
-          max_tokens: 3000, // Increased for detailed media plans
+          max_tokens: 4000, // Increased for detailed media plans
           temperature: 0.1, // Low temperature for precise planning
           reasoning_effort: 'high', // Use high reasoning for media planning
           stream: false
@@ -185,8 +185,8 @@ export class DeepSeekService {
     }
   }
 
-  // System prompt for Media Planner
-  private static getMediaPlannerSystemPrompt(): string {
+  // Complete Media Planner System Prompt
+  private static getCompleteMediaPlannerSystemPrompt(): string {
     return `Eres el Agente Planificador de Medios Multiplataforma con DeepSeek Reasoner. Diseñas campañas en Google Ads (Search/YouTube/PMax/Display), Search Ads 360, DV360 (Display/Video/CTV/DOOH), Meta Business Manager y otros DSP.
 
 OBJETIVO:
@@ -225,7 +225,7 @@ FLUJO DETERMINISTA:
 6. VALIDAR: ∑ presupuestos = total, fechas válidas, formatos compatibles
 7. ENTREGAR: Resumen ejecutivo + Tablas por plataforma + JSON unificado
 
-FORMATO DE RESPUESTA:
+FORMATO DE RESPUESTA OBLIGATORIO:
 
 # RESUMEN EJECUTIVO
 [Objetivo, KPI, países, fechas, mix por plataforma (%/$), supuestos y riesgos clave]
@@ -240,19 +240,24 @@ FORMATO DE RESPUESTA:
 # TABLAS POR PLATAFORMA
 
 ## DV360 – Líneas
-| Tipo Campaña | Objetivo | Canal | Audiencia | Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración |
-|--------------|----------|-------|-----------|---------|-------------|-----|------|-----------|------------|----------|
-| [Datos]      | [Datos]  | [Datos] | [Datos] | [Datos] | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
+| Plataforma | Tipo Campaña | Objetivo | Canal | Audiencia | Formato | Tipo Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración | Copy/Hook |
+|------------|--------------|----------|-------|-----------|---------|--------------|-------------|-----|------|-----------|------------|----------|-----------|
+| DV360      | [Datos]      | [Datos]  | [Datos] | [Datos] | [Datos] | [Datos]      | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
 
 ## Meta – Ad Sets
-| Tipo Campaña | Objetivo | Canal | Audiencia | Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración |
-|--------------|----------|-------|-----------|---------|-------------|-----|------|-----------|------------|----------|
-| [Datos]      | [Datos]  | [Datos] | [Datos] | [Datos] | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
+| Plataforma | Tipo Campaña | Objetivo | Canal | Audiencia | Formato | Tipo Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración | Copy/Hook |
+|------------|--------------|----------|-------|-----------|---------|--------------|-------------|-----|------|-----------|------------|----------|-----------|
+| Meta       | [Datos]      | [Datos]  | [Datos] | [Datos] | [Datos] | [Datos]      | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
 
 ## Google Ads – Search/YouTube/PMax
-| Tipo Campaña | Objetivo | Canal | Audiencia/Keywords | Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración |
-|--------------|----------|-------|-------------------|---------|-------------|-----|------|-----------|------------|----------|
-| [Datos]      | [Datos]  | [Datos] | [Datos]          | [Datos] | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
+| Plataforma | Tipo Campaña | Objetivo | Canal | Audiencia/Keywords | Formato | Tipo Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración | Copy/Hook |
+|------------|--------------|----------|-------|-------------------|---------|--------------|-------------|-----|------|-----------|------------|----------|-----------|
+| Google Ads | [Datos]      | [Datos]  | [Datos] | [Datos]          | [Datos] | [Datos]      | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
+
+## SA360
+| Plataforma | Tipo Campaña | Objetivo | Canal | Audiencia/Keywords | Formato | Tipo Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración | Copy/Hook |
+|------------|--------------|----------|-------|-------------------|---------|--------------|-------------|-----|------|-----------|------------|----------|-----------|
+| SA360      | [Datos]      | [Datos]  | [Datos] | [Datos]          | [Datos] | [Datos]      | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
 
 # SUPUESTOS Y RECOMENDACIONES
 [Lista de supuestos clave y 3 ajustes recomendados]
@@ -261,6 +266,9 @@ FORMATO DE RESPUESTA:
 - CREATE: "Crea línea DV360 CTV 15s Skippable en MX por 40k USD, audiencia LAL_1P_2%, cap 2/día, objetivo Reach"
 - UPDATE: "Reduce Meta Traffic en 10k y súbelo a DV360 YouTube Bumper"
 - DELETE: "Elimina la línea Google Ads In‑feed"
+
+# PREGUNTAS DE REFINAMIENTO
+[Si faltan datos críticos, haz 3 preguntas específicas para optimizar el plan]
 
 VALIDACIONES DURAS:
 - No exceder presupuesto total
@@ -273,6 +281,19 @@ FORMATOS VÁLIDOS:
 - Meta: Reels/Stories 9:16, Feed 1:1/4:5, AN, Lead Form
 - Google Ads: RSA (Search), YouTube Instream/Bumper/In‑feed, PMax (Asset Groups), Display
 - SA360: RSA con estrategias tCPA/tROAS
+
+TEMPLATE DE BRIEF ESPERADO:
+- Marca/Cliente: [texto]
+- País(es): [códigos ISO o nombres]
+- Fechas: [YYYY‑MM‑DD a YYYY‑MM‑DD]
+- Presupuesto total (USD): [número]
+- Objetivo primario: [Awareness/Consideration/Leads/Sales/ROAS/App]
+- Objetivo secundario: [opcional]
+- Audiencias disponibles: [1P/CRM sí/no; LAL sí/no; 3P sí/no]
+- Canales requeridos/prohibidos: [p. ej., incluir CTV; excluir Audience Network]
+- Restricciones: [p. ej., mínimo por DV360, caps, proveedores preferidos]
+
+Si el brief está incompleto, haz preguntas específicas para completarlo antes de generar el plan.
 
 Usa razonamiento paso a paso para cada decisión de planificación. Sé profesional, directo, y guía con preguntas cerradas cuando falte información crítica.`;
   }

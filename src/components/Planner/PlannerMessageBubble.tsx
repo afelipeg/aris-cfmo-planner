@@ -195,10 +195,10 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
             </div>
             <div className="flex-1">
               <h3 className="font-medium text-white text-sm">
-                Media Planner
+                Planificador de Medios Multiplataforma
               </h3>
               <p className="text-white/80 text-xs">
-                DeepSeek • Google Ads • DV360 • Meta • SA360
+                DeepSeek Reasoner • Google Ads • DV360 • Meta • SA360 • DSPs
               </p>
             </div>
             <div className="flex items-center gap-1">
