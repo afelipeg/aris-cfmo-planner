@@ -595,14 +595,12 @@ export const Dashboard: React.FC = () => {
     console.log('🚀 Sending planner message to DeepSeek:', {
       content: content.substring(0, 50) + '...',
       fileCount: files.length,
-    });
 
     // Create AbortController for cancellation
     const controller = new AbortController();
     setPlannerAbortController(controller);
     setPlannerLoading(true);
 
-    try {
       // Create chat if none exists
       let currentChat = activePlannerChat;
       if (!currentChat) {
@@ -615,59 +613,17 @@ export const Dashboard: React.FC = () => {
 
       // Save user message to database
       const userMessageData = {
-        chat_id: currentChat.id,
-        content,
-        role: 'user' as const,
-        attachments: files.map((file, index) => ({
-          id: `attachment-${Date.now()}-${index}`,
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          url: URL.createObjectURL(file)
-        }))
-      };
-
-      const { data: savedUserMessage, error: userMessageError } = await supabase
-        .from('planner_messages')
-        .insert([userMessageData])
-        .select()
-        .maybeSingle();
-
-      if (userMessageError) {
-        console.error('❌ Error saving user message:', userMessageError);
-        throw userMessageError;
-      }
-
-      if (!savedUserMessage) {
-        throw new Error('Failed to save planner user message - no data returned');
-      }
-
-      console.log('✅ User message saved:', savedUserMessage.id);
-      // Add user message to UI immediately
-      setPlannerMessages(prev => [...prev, savedUserMessage]);
-
-      // Get conversation history for context
-      const conversationHistory = plannerMessages.map(msg => ({
-        role: msg.role,
-        content: msg.content
-      }));
-
-      // Send message to DeepSeek
-      console.log('🧠 Sending message to DeepSeek Media Planner...');
-      const response = await deepseekService.sendPlannerMessage({
         message: content,
         files,
         conversationHistory
       }, controller.signal);
 
-      // Check if aborted
       if (controller.signal.aborted) {
         console.log('🛑 Request was aborted, not saving results');
         return;
       }
-
+        content: assistantResponse || 'No response content',
       if (!response.success) {
-        throw new Error(response.error || 'DeepSeek failed');
       }
 
       console.log('✅ DeepSeek response received');
@@ -694,14 +650,21 @@ export const Dashboard: React.FC = () => {
         throw new Error('Failed to save planner assistant message - no data returned');
       }
 
-      console.log('✅ Assistant message saved:', savedAssistantMessage.id);
-      // Add assistant message to UI
-      setPlannerMessages(prev => [...prev, savedAssistantMessage]);
+        const response = await deepseekService.sendPlannerMessage({
+          message: content,
+          files,
+          conversationHistory
+        }, controller.signal);
 
-      // Update chat title if it's the first message
+        if (!response.success) {
+          throw new Error(response.error || 'DeepSeek failed');
+        }
+
+        assistantResponse = response.content;
+        console.log('✅ Assistant response received from DeepSeek');
       if (plannerMessages.length === 0) {
-        const title = content.length > 50 ? content.substring(0, 50) + '...' : content;
-        await renamePlannerChat(currentChat.id, title);
+        console.error('❌ DeepSeek API error:', error);
+        throw new Error(`DeepSeek API failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
 
       // Update chat timestamp
@@ -718,7 +681,7 @@ export const Dashboard: React.FC = () => {
       
     } catch (error) {
       console.error('❌ Error in planner handleSendMessage:', error);
-      
+      console.log('🎉 Planner message process completed successfully with DeepSeek');
       // Add error message to chat
       const errorMessage: PlannerMessage = {
         id: `error-${Date.now()}`,
@@ -728,7 +691,6 @@ export const Dashboard: React.FC = () => {
         created_at: new Date().toISOString()
       };
       setPlannerMessages(prev => [...prev, errorMessage]);
-    } finally {
       setPlannerLoading(false);
       setPlannerAbortController(null);
     }
@@ -738,14 +700,13 @@ export const Dashboard: React.FC = () => {
     if (plannerAbortController) {
       console.log('🛑 User requested to stop planner analysis');
       plannerAbortController.abort();
-      setPlannerLoading(false);
       setPlannerAbortController(null);
 
       // Add stopped message to chat
       const stoppedMessage: PlannerMessage = {
         id: `stopped-${Date.now()}`,
         chat_id: activePlannerChat?.id || 'temp',
-        content: '🛑 Analysis stopped by user',
+        content: '🛑 Análisis detenido por el usuario. DeepSeek ha sido interrumpido. Puedes enviar un nuevo mensaje o intentar de nuevo.',
         role: 'assistant',
         created_at: new Date().toISOString()
       };
@@ -758,7 +719,7 @@ export const Dashboard: React.FC = () => {
   // Navigation handlers
   const handleViewChange = (view: DashboardView) => {
     console.log('🔄 Changing view to:', view);
-    setActiveView(view);
+        content: `❌ Error en Planner: ${error instanceof Error ? error.message : 'Error desconocido'}. Verifica tu configuración de DeepSeek API.`,
     
     // Check API when switching views
     setTimeout(() => {
