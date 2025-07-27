@@ -92,12 +92,6 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
                           <span>{attachment.type}</span>
                           <span>•</span>
                           <span>{formatFileSize(attachment.size)}</span>
-                          {attachment.file_id && (
-                            <>
-                              <span>•</span>
-                              <span>📤 Subido a OpenAI</span>
-                            </>
-                          )}
                         </div>
                       </div>
                       <div className="flex-shrink-0">
@@ -106,7 +100,7 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
                     </div>
                   ))}
                   <div className="text-xs text-blue-100 italic bg-white/5 p-2 rounded border border-white/10">
-                    ✅ Documentos analizados por el Asistente de Planificación OpenAI
+                    ✅ Documentos analizados por DeepSeek Reasoner
                   </div>
                 </div>
               )}
@@ -131,7 +125,7 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
           {/* Assistant Header */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 flex items-center gap-3">
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white">
-              <span className="text-lg">📋</span>
+              <span className="text-lg">🧠</span>
             </div>
             <div className="flex-1">
               <h3 className="font-medium text-white text-sm">

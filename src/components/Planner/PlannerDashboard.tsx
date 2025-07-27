@@ -4,7 +4,7 @@ import { PlannerSidebar } from './PlannerSidebar';
 import { PlannerArea } from './PlannerArea';
 import { PlannerInput } from './PlannerInput';
 import { useAuth } from '../../contexts/AuthContext';
-import { PlannerChat, PlannerMessage, PlannerThread } from '../../types/planner';
+import { PlannerChat, PlannerMessage } from '../../types/planner';
 import { deepseekService } from '../../lib/deepseekService';
 import { supabase } from '../../lib/supabase';
 
@@ -226,7 +226,7 @@ export const PlannerDashboard: React.FC = () => {
   };
 
   const handleSendMessage = async (content: string, files: File[]) => {
-    console.log('🚀 Sending planner message:', {
+    console.log('🚀 Sending planner message to DeepSeek Reasoner:', {
       content: content.substring(0, 50) + '...',
       fileCount: files.length,
     });
@@ -342,7 +342,7 @@ export const PlannerDashboard: React.FC = () => {
       console.log('🔄 Refreshing planner chats list...');
       await loadChats();
 
-      console.log('🎉 Planner message process completed successfully');
+      console.log('🎉 Planner message process completed successfully with DeepSeek Reasoner');
       
     } catch (error) {
       console.error('❌ Error in planner handleSendMessage:', error);
