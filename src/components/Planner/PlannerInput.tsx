@@ -83,7 +83,7 @@ export const PlannerInput: React.FC<PlannerInputProps> = ({ onSendMessage, onSto
                 onKeyDown={handleKeyDown}
                 placeholder={
                   disabled
-                    ? 'DeepSeek Reasoner está trabajando...'
+                    ? 'DeepSeek está trabajando...'
                     : 'Describe tu campaña: objetivo, presupuesto, fechas, mercados... o sube documentos para crear un plan de medios optimizado'
                 }
                 disabled={disabled}

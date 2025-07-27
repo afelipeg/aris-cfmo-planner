@@ -40,14 +40,13 @@ export const PlannerDashboard: React.FC = () => {
 
   const checkApiConnection = async () => {
     try {
-      console.log('🔍 Checking DeepSeek Reasoner API connection for Planner...');
+      console.log('🔍 Checking DeepSeek API connection for Media Planner...');
       const status = await deepseekService.testConnection();
       setApiStatus(status);
-      console.log('🔌 DeepSeek Reasoner API Status:', status);
+      console.log('🔌 DeepSeek Media Planner API Status:', status);
       
       if (!status.success) {
         console.error('❌ DeepSeek API failed with message:', status.message);
-        console.error('🔧 Check DeepSeek API key configuration');
       }
     } catch (error) {
       console.error('❌ Error checking DeepSeek API connection:', error);
@@ -62,7 +61,7 @@ export const PlannerDashboard: React.FC = () => {
     setTestingApi(true);
     
     try {
-      console.log('🧪 Starting DeepSeek Reasoner API test...');
+      console.log('🧪 Starting DeepSeek Media Planner API test...');
       const result = await deepseekService.testConnection();
       setApiStatus(result);
       
@@ -144,7 +143,7 @@ export const PlannerDashboard: React.FC = () => {
         .from('planner_chats')
         .insert([
           {
-            title: 'Nuevo Plan',
+            title: 'Nuevo Plan de Medios',
             user_id: user.id,
           }
         ])
@@ -226,7 +225,7 @@ export const PlannerDashboard: React.FC = () => {
   };
 
   const handleSendMessage = async (content: string, files: File[]) => {
-    console.log('🚀 Sending planner message to DeepSeek Reasoner:', {
+    console.log('🚀 Sending planner message to DeepSeek:', {
       content: content.substring(0, 50) + '...',
       fileCount: files.length,
     });
@@ -283,8 +282,8 @@ export const PlannerDashboard: React.FC = () => {
       // Add user message to UI immediately
       setMessages(prev => [...prev, savedUserMessage]);
 
-      // Send message to DeepSeek Reasoner
-      console.log('🧠 Sending message to DeepSeek Reasoner...');
+      // Send message to DeepSeek
+      console.log('🧠 Sending message to DeepSeek Media Planner...');
       const response = await deepseekService.sendPlannerMessage({
         message: content,
         files,
@@ -298,10 +297,10 @@ export const PlannerDashboard: React.FC = () => {
       }
 
       if (!response.success) {
-        throw new Error(response.error || 'DeepSeek Reasoner failed');
+        throw new Error(response.error || 'DeepSeek Media Planner failed');
       }
 
-      console.log('✅ DeepSeek Reasoner response received');
+      console.log('✅ DeepSeek response received');
 
       // Save assistant message to database
       const assistantMessageData = {
@@ -342,7 +341,7 @@ export const PlannerDashboard: React.FC = () => {
       console.log('🔄 Refreshing planner chats list...');
       await loadChats();
 
-      console.log('🎉 Planner message process completed successfully with DeepSeek Reasoner');
+      console.log('🎉 Planner message process completed successfully with DeepSeek');
       
     } catch (error) {
       console.error('❌ Error in planner handleSendMessage:', error);
@@ -373,7 +372,7 @@ export const PlannerDashboard: React.FC = () => {
       const stoppedMessage: PlannerMessage = {
         id: `stopped-${Date.now()}`,
         chat_id: activeChat?.id || 'temp',
-        content: '🛑 Análisis detenido por el usuario. DeepSeek Reasoner ha sido interrumpido. Puedes enviar un nuevo mensaje o intentar de nuevo.',
+        content: '🛑 Análisis detenido por el usuario. DeepSeek ha sido interrumpido. Puedes enviar un nuevo mensaje o intentar de nuevo.',
         role: 'assistant',
         created_at: new Date().toISOString()
       };
@@ -418,7 +417,7 @@ export const PlannerDashboard: React.FC = () => {
                   {activeChat.title}
                 </h2>
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-300">
-                  🧠 DeepSeek Reasoner
+                  🧠 DeepSeek Media Planner
                 </span>
               </div>
             )}
@@ -430,10 +429,10 @@ export const PlannerDashboard: React.FC = () => {
               onClick={testDeepSeekAPI}
               disabled={testingApi}
               className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
-              title="Test DeepSeek Reasoner API"
+              title="Test DeepSeek Media Planner API"
             >
               <Brain size={16} className={testingApi ? 'animate-spin' : ''} />
-              {testingApi ? 'Probando...' : 'Test Reasoner'}
+              {testingApi ? 'Probando...' : 'Test DeepSeek'}
             </button>
           </div>
         </div>
@@ -445,7 +444,7 @@ export const PlannerDashboard: React.FC = () => {
               <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-400">
-                  ⚠️ DeepSeek Reasoner API no configurado correctamente
+                  ⚠️ DeepSeek API no configurado correctamente
                 </p>
                 <p className="text-xs text-amber-700 dark:text-amber-400">
                   {apiStatus.message}

@@ -45,7 +45,6 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     if (user) {
       console.log('👤 User logged in, loading data for:', user.id);
-      console.log('🔍 FIXED: Users table should now exist, proceeding with data load...');
       loadChats();
       loadPlannerChats();
       checkApiConnection();
@@ -75,31 +74,23 @@ export const Dashboard: React.FC = () => {
   const checkApiConnection = async () => {
     try {
       console.log('🔍 Checking API connections...');
-      console.log('🔍 DEBUGGING: Current view:', activeView);
-      console.log('🔍 DEBUGGING: Environment variables check:', {
-        hasOpenAI: !!import.meta.env.VITE_OPENAI_API_KEY,
-        hasDeepSeek: !!import.meta.env.VITE_DEEPSEEK_API_KEY,
-        hasSerper: !!import.meta.env.VITE_SERPER_API_KEY,
-        openAIPrefix: import.meta.env.VITE_OPENAI_API_KEY?.substring(0, 20) || 'NOT SET'
-      });
       
       if (activeView === 'chat') {
         const status = await llmService.testDeepSeekMessage();
         setApiTestResult(status);
         console.log('🧠 DeepSeek API Status:', status);
       } else if (activeView === 'planner') {
-        console.log('🧠 Testing DeepSeek Reasoner connection for Planner...');
         const status = await deepseekService.testConnection();
         setApiTestResult(status);
-        console.log('🧠 DeepSeek Reasoner API Status:', status);
+        console.log('🧠 DeepSeek Planner API Status:', status);
       } else {
         setApiTestResult({ success: true, message: 'Document analysis ready' });
       }
     } catch (error) {
-      console.error('❌ DEBUGGING: Error checking API connection:', error);
+      console.error('❌ Error checking API connection:', error);
       setApiTestResult({ 
         success: false, 
-        message: `DEBUGGING: Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
+        message: `Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
       });
     }
   };
