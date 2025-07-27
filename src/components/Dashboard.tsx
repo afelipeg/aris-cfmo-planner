@@ -196,11 +196,15 @@ export const Dashboard: React.FC = () => {
           }
         ])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('❌ Error creating chat:', error);
         throw error;
+      }
+
+      if (!data) {
+        throw new Error('Failed to create chat - no data returned');
       }
 
       const newChat = data;
@@ -321,11 +325,15 @@ export const Dashboard: React.FC = () => {
         .from('messages')
         .insert([userMessageData])
         .select()
-        .single();
+        .maybeSingle();
 
       if (userMessageError) {
         console.error('❌ Error saving user message:', userMessageError);
         throw userMessageError;
+      }
+
+      if (!savedUserMessage) {
+        throw new Error('Failed to save user message - no data returned');
       }
 
       console.log('✅ User message saved:', savedUserMessage.id);
@@ -362,11 +370,15 @@ export const Dashboard: React.FC = () => {
         .from('messages')
         .insert([assistantMessageData])
         .select()
-        .single();
+        .maybeSingle();
 
       if (assistantMessageError) {
         console.error('❌ Error saving assistant message:', assistantMessageError);
         throw assistantMessageError;
+      }
+
+      if (!savedAssistantMessage) {
+        throw new Error('Failed to save assistant message - no data returned');
       }
 
       console.log('✅ Assistant message saved:', savedAssistantMessage.id);
@@ -499,11 +511,15 @@ export const Dashboard: React.FC = () => {
           }
         ])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('❌ Error creating planner chat:', error);
         throw error;
+      }
+
+      if (!data) {
+        throw new Error('Failed to create planner chat - no data returned');
       }
 
       const newChat = data;
@@ -615,11 +631,15 @@ export const Dashboard: React.FC = () => {
         .from('planner_messages')
         .insert([userMessageData])
         .select()
-        .single();
+        .maybeSingle();
 
       if (userMessageError) {
         console.error('❌ Error saving user message:', userMessageError);
         throw userMessageError;
+      }
+
+      if (!savedUserMessage) {
+        throw new Error('Failed to save planner user message - no data returned');
       }
 
       console.log('✅ User message saved:', savedUserMessage.id);
@@ -663,11 +683,15 @@ export const Dashboard: React.FC = () => {
         .from('planner_messages')
         .insert([assistantMessageData])
         .select()
-        .single();
+        .maybeSingle();
 
       if (assistantMessageError) {
         console.error('❌ Error saving assistant message:', assistantMessageError);
         throw assistantMessageError;
+      }
+
+      if (!savedAssistantMessage) {
+        throw new Error('Failed to save planner assistant message - no data returned');
       }
 
       console.log('✅ Assistant message saved:', savedAssistantMessage.id);

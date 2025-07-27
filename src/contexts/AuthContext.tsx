@@ -76,14 +76,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }, {
               onConflict: 'id'
             })
-            .select();
+            .select()
+            .maybeSingle();
           
           if (error) {
             console.error('❌ Error creating/updating user profile:', error);
             // Don't throw error, just log it - allow user to continue
             console.warn('⚠️ Continuing without user profile creation');
           } else {
-            console.log('✅ User profile created/updated successfully:', data);
+            console.log('✅ User profile created/updated successfully:', data || 'No data returned');
           }
         } catch (error) {
           console.error('❌ Exception with user profile:', error);
