@@ -882,7 +882,6 @@ export const Dashboard: React.FC = () => {
                 <>
                   <PlannerArea 
                     messages={plannerMessages} 
-                    loading={plannerLoading} 
                   />
                   <PlannerInput 
                     onSendMessage={handleSendPlannerMessage} 
