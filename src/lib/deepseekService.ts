@@ -83,7 +83,7 @@ export class DeepSeekService {
     const startTime = Date.now();
     
     try {
-      console.log('📋 Sending message to DeepSeek Reasoner Media Planner...');
+      console.log('📋 Sending message to DeepSeek Reasoner...');
       
       if (!this.API_KEY) {
         throw new Error('DeepSeek API key not configured');
