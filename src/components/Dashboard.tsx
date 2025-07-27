@@ -597,12 +597,6 @@ export const Dashboard: React.FC = () => {
         }
       }
 
-      // Get conversation history for context
-      const conversationHistory = plannerMessages.map(msg => ({
-        role: msg.role,
-        content: msg.content
-      }));
-
       // Save user message to database
       const userMessageData = {
         chat_id: currentChat.id,
@@ -617,38 +611,29 @@ export const Dashboard: React.FC = () => {
         }))
       };
 
-      let savedUserMessage;
-      try {
-        const { data, error: userMessageError } = await supabase
-          .from('planner_messages')
-          .insert([userMessageData])
-          .select()
-          .single();
+      const { data: savedUserMessage, error: userMessageError } = await supabase
+        .from('planner_messages')
+        .insert([userMessageData])
+        .select()
+        .single();
 
-        if (userMessageError) {
-          console.error('❌ Error saving user message:', userMessageError);
-          throw userMessageError;
-        }
-        
-        savedUserMessage = data;
-        console.log('✅ User message saved to database:', savedUserMessage.id);
-      } catch (dbError) {
-        console.error('❌ Database error saving user message:', dbError);
-        // Create a temporary message for UI
-        savedUserMessage = {
-          id: `temp-${Date.now()}`,
-          ...userMessageData,
-          created_at: new Date().toISOString()
-        };
-        console.warn('⚠️ Using temporary message for UI');
+      if (userMessageError) {
+        console.error('❌ Error saving user message:', userMessageError);
+        throw userMessageError;
       }
 
-
+      console.log('✅ User message saved:', savedUserMessage.id);
       // Add user message to UI immediately
       setPlannerMessages(prev => [...prev, savedUserMessage]);
 
-      // Send message to DeepSeek Reasoner
-      console.log('🧠 Sending message to DeepSeek Reasoner...');
+      // Get conversation history for context
+      const conversationHistory = plannerMessages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      // Send message to DeepSeek
+      console.log('🧠 Sending message to DeepSeek Media Planner...');
       const response = await deepseekService.sendPlannerMessage({
         message: content,
         files,
@@ -662,10 +647,10 @@ export const Dashboard: React.FC = () => {
       }
 
       if (!response.success) {
-        throw new Error(response.error || 'DeepSeek Reasoner failed');
+        throw new Error(response.error || 'DeepSeek Media Planner failed');
       }
 
-      console.log('✅ DeepSeek Reasoner response received');
+      console.log('✅ DeepSeek response received');
 
       // Save assistant message to database
       const assistantMessageData = {
@@ -674,69 +659,38 @@ export const Dashboard: React.FC = () => {
         role: 'assistant' as const
       };
 
-      let savedAssistantMessage;
-      try {
-        const { data, error: assistantMessageError } = await supabase
-          .from('planner_messages')
-          .insert([assistantMessageData])
-          .select()
-          .single();
+      const { data: savedAssistantMessage, error: assistantMessageError } = await supabase
+        .from('planner_messages')
+        .insert([assistantMessageData])
+        .select()
+        .single();
 
-        if (assistantMessageError) {
-          console.error('❌ Error saving assistant message:', assistantMessageError);
-          // Don't throw, create temporary message
-        }
-        
-        savedAssistantMessage = data || {
-          id: `temp-assistant-${Date.now()}`,
-          ...assistantMessageData,
-          created_at: new Date().toISOString()
-        };
-        console.log('✅ Assistant message saved to database:', savedAssistantMessage.id);
-      } catch (dbError) {
-        console.error('❌ Database error saving assistant message:', dbError);
-        // Create temporary message for UI
-        savedAssistantMessage = {
-          id: `temp-assistant-${Date.now()}`,
-          ...assistantMessageData,
-          created_at: new Date().toISOString()
-        };
-        console.warn('⚠️ Using temporary assistant message for UI');
+      if (assistantMessageError) {
+        console.error('❌ Error saving assistant message:', assistantMessageError);
+        throw assistantMessageError;
       }
 
-
+      console.log('✅ Assistant message saved:', savedAssistantMessage.id);
       // Add assistant message to UI
       setPlannerMessages(prev => [...prev, savedAssistantMessage]);
 
       // Update chat title if it's the first message
       if (plannerMessages.length === 0) {
         const title = content.length > 50 ? content.substring(0, 50) + '...' : content;
-        try {
-          await renamePlannerChat(currentChat.id, title);
-        } catch (error) {
-          console.warn('⚠️ Failed to rename chat, continuing:', error);
-        }
+        await renamePlannerChat(currentChat.id, title);
       }
 
       // Update chat timestamp
-      try {
-        await supabase
-          .from('planner_chats')
-          .update({ updated_at: new Date().toISOString() })
-          .eq('id', currentChat.id);
-      } catch (error) {
-        console.warn('⚠️ Failed to update chat timestamp:', error);
-      }
+      await supabase
+        .from('planner_chats')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', currentChat.id);
 
       // Refresh chats to update the sidebar
       console.log('🔄 Refreshing planner chats list...');
-      try {
-        await loadPlannerChats();
-      } catch (error) {
-        console.warn('⚠️ Failed to refresh chats list:', error);
-      }
+      await loadPlannerChats();
 
-      console.log('🎉 Planner message process completed successfully');
+      console.log('🎉 Planner message process completed successfully with DeepSeek');
       
     } catch (error) {
       console.error('❌ Error in planner handleSendMessage:', error);
@@ -745,7 +699,7 @@ export const Dashboard: React.FC = () => {
       const errorMessage: PlannerMessage = {
         id: `error-${Date.now()}`,
         chat_id: activePlannerChat?.id || 'temp',
-        content: `❌ Error en Planner: ${error instanceof Error ? error.message : 'Error desconocido'}. Verifica tu configuración de DeepSeek API.`,
+        content: `❌ Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
         role: 'assistant',
         created_at: new Date().toISOString()
       };
@@ -767,7 +721,7 @@ export const Dashboard: React.FC = () => {
       const stoppedMessage: PlannerMessage = {
         id: `stopped-${Date.now()}`,
         chat_id: activePlannerChat?.id || 'temp',
-        content: '🛑 Análisis detenido por el usuario. DeepSeek Reasoner ha sido interrumpido. Puedes enviar un nuevo mensaje o intentar de nuevo.',
+        content: '🛑 Analysis stopped by user',
         role: 'assistant',
         created_at: new Date().toISOString()
       };
