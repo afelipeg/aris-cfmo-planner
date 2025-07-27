@@ -576,7 +576,7 @@ export const Dashboard: React.FC = () => {
   };
 
   const handleSendPlannerMessage = async (content: string, files: File[]) => {
-    console.log('🚀 Sending planner message to DeepSeek Reasoner:', {
+    console.log('🚀 Sending planner message to DeepSeek Reasoner (NO OpenAI):', {
       content: content.substring(0, 50) + '...',
       fileCount: files.length,
     });
@@ -633,7 +633,7 @@ export const Dashboard: React.FC = () => {
       }));
 
       // Send message to DeepSeek Reasoner
-      console.log('🧠 Sending message to DeepSeek Reasoner Media Planner...');
+      console.log('🧠 Sending message to DeepSeek Reasoner Media Planner (NO OpenAI threads)...');
       const response = await deepseekService.sendPlannerMessage({
         message: content,
         files,
