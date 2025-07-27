@@ -461,7 +461,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                     {user?.email}
                   </p>
-                  <span>Media Planner</span>
                 </div>
               </div>
             </SidebarMenuItem>
