@@ -592,7 +592,7 @@ export const Dashboard: React.FC = () => {
   };
 
   const handleSendPlannerMessage = async (content: string, files: File[]) => {
-    console.log('🚀 Sending planner message to DeepSeek Reasoner (NO OpenAI):', {
+    console.log('🚀 Sending planner message to DeepSeek:', {
       content: content.substring(0, 50) + '...',
       fileCount: files.length,
     });
@@ -652,8 +652,8 @@ export const Dashboard: React.FC = () => {
         content: msg.content
       }));
 
-      // Send message to DeepSeek Reasoner
-      console.log('🧠 Sending message to DeepSeek Reasoner Media Planner (NO OpenAI threads)...');
+      // Send message to DeepSeek
+      console.log('🧠 Sending message to DeepSeek Media Planner...');
       const response = await deepseekService.sendPlannerMessage({
         message: content,
         files,
@@ -667,10 +667,10 @@ export const Dashboard: React.FC = () => {
       }
 
       if (!response.success) {
-        throw new Error(response.error || 'DeepSeek Reasoner failed');
+        throw new Error(response.error || 'DeepSeek failed');
       }
 
-      console.log('✅ DeepSeek Reasoner response received');
+      console.log('✅ DeepSeek response received');
 
       // Save assistant message to database
       const assistantMessageData = {
@@ -714,7 +714,7 @@ export const Dashboard: React.FC = () => {
       console.log('🔄 Refreshing planner chats list...');
       await loadPlannerChats();
 
-      console.log('🎉 Planner message process completed successfully with DeepSeek Reasoner');
+      console.log('🎉 Planner message process completed successfully with DeepSeek');
       
     } catch (error) {
       console.error('❌ Error in planner handleSendMessage:', error);
