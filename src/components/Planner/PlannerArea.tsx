@@ -29,7 +29,7 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading }) =
               <span className="text-2xl">📊</span>
             </div>
             <h2 className="text-xl font-medium text-gray-900 dark:text-white mb-3">
-              DeepSeek Reasoner - Planificador de Medios
+              DeepSeek - Planificador de Medios
             </h2>
             <p className="text-gray-600 dark:text-gray-400 max-w-md leading-relaxed mb-4">
               Especialista en Google Ads, DV360, Meta, SA360 y otros DSP. Diseña campañas optimizadas para maximizar tu KPI dentro del presupuesto.

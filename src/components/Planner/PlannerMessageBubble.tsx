@@ -195,7 +195,7 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
             </div>
             <div className="flex-1">
               <h3 className="font-medium text-white text-sm">
-                DeepSeek Reasoner - Planificador de Medios
+                DeepSeek - Planificador de Medios
               </h3>
               <p className="text-white/80 text-xs">
                 Google Ads • DV360 • Meta • SA360 • DSPs
