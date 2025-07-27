@@ -58,6 +58,11 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading }) =
               <div className="flex justify-start">
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-4 rounded-2xl rounded-bl-md border border-blue-100 dark:border-blue-800">
                   <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                    <div className="animate-spin w-4 h-4 border-2 border-blue-300 border-t-blue-600 dark:border-blue-600 dark:border-t-blue-300 rounded-full" />
+                    <span className="text-sm">
+                      🧠 DeepSeek Reasoner creando plan de medios optimizado...
+                    </span>
+                  </div>
                 </div>
               </div>
             )}
