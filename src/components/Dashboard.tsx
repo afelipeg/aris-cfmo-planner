@@ -872,7 +872,7 @@ export const Dashboard: React.FC = () => {
                       {activePlannerChat.title}
                     </h2>
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-300">
-                      🧠 DeepSeek Reasoner
+                      📊 Media Planner • DeepSeek
                     </span>
                   </div>
                 )}
