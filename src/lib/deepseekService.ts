@@ -23,7 +23,7 @@ export interface DeepSeekPlannerRequest {
 export class DeepSeekService {
   private static readonly API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-8d66744aba474bbc8b59399779a67295';
   private static readonly API_URL = 'https://api.deepseek.com/v1/chat/completions';
-  private static readonly MODEL = 'deepseek-reasoner';
+  private static readonly MODEL = 'deepseek-chat';
   
   // Test connection
   static async testConnection(): Promise<{ success: boolean; message: string }> {
@@ -44,7 +44,7 @@ export class DeepSeekService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: this.MODEL,
+          model: 'deepseek-chat',
           messages: [
             { role: 'system', content: 'You are a helpful assistant.' },
             { role: 'user', content: 'Test message' }
@@ -67,7 +67,7 @@ export class DeepSeekService {
       
       return {
         success: true,
-        message: `✅ DeepSeek Reasoner working! Model: ${data.model || 'deepseek-reasoner'} | Media Planning Ready`
+        message: `✅ DeepSeek working! Model: ${data.model || 'deepseek-chat'} | Media Planning Ready`
       };
     } catch (error) {
       console.error('❌ DeepSeek test failed:', error);
@@ -133,11 +133,10 @@ export class DeepSeekService {
         },
         signal: controller.signal,
         body: JSON.stringify({
-          model: this.MODEL,
+          model: 'deepseek-chat',
           messages,
           max_tokens: 4000, // Increased for detailed media plans
           temperature: 0.1, // Low temperature for precise planning
-          reasoning_effort: 'high', // Use high reasoning for media planning
           stream: false
         })
       });
@@ -157,7 +156,6 @@ export class DeepSeekService {
       return {
         success: true,
         content: data.choices[0].message.content,
-        reasoning: data.choices[0].message.reasoning_content || '',
         metadata: {
           model: data.model || this.MODEL,
           tokens_used: data.usage?.total_tokens || 0,
