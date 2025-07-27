@@ -13,13 +13,13 @@ Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials) 
 **Client ID**: `530847693505-rv6vsqgstj2v0g5b7r53jobdd6l9iprt.apps.googleusercontent.com`
 
 **Add these Authorized Redirect URIs:**
-```
+\`\`\`
 https://aris.netlify.app
 https://aris.netlify.app/
 https://your-supabase-project.supabase.co/auth/v1/callback
 http://localhost:5173
 https://localhost:5173
-```
+\`\`\`
 
 ### Step 2: Update Supabase Configuration (URGENT)
 
@@ -28,23 +28,23 @@ In your Supabase Dashboard → Settings → API:
 **Site URL:** `https://aris.netlify.app`
 
 **Additional Redirect URLs (one per line):**
-```
+\`\`\`
 https://aris.netlify.app
 https://aris.netlify.app/**
 http://localhost:5173
 http://localhost:5173/**
-```
+\`\`\`
 
 ### Step 3: Verify Environment Variables in Netlify
 
 In Netlify Dashboard → Site Settings → Environment Variables:
 
-```
+\`\`\`
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_OPENAI_API_KEY=your_openai_api_key
 VITE_ANTHROPIC_API_KEY=your_anthropic_api_key
-```
+\`\`\`
 
 ### Step 4: Test Production OAuth
 

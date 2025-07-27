@@ -55,7 +55,7 @@ A sophisticated business intelligence platform powered by specialized AI agents 
 
 Create a `.env` file with the following variables:
 
-```env
+\`\`\`env
 # Supabase Configuration
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -70,7 +70,7 @@ VITE_SERPER_API_KEY=your_serper_api_key
 # App Configuration
 VITE_APP_NAME=Talos
 VITE_MAX_FILE_SIZE=10485760
-```
+\`\`\`
 
 ### 2. Supabase Setup
 
@@ -113,7 +113,7 @@ Row Level Security (RLS) is enabled for all tables to ensure data privacy.
 
 ### 4. Development
 
-```bash
+\`\`\`bash
 # Install dependencies
 npm install
 
@@ -122,7 +122,7 @@ npm run dev
 
 # Build for production
 npm run build
-```
+\`\`\`
 
 ### 5. Deployment
 
