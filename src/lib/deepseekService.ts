@@ -1,4 +1,4 @@
-// src/lib/deepseekService.ts - Servicio unificado DeepSeek Reasoner
+// src/lib/deepseekService.ts - Servicio DeepSeek Reasoner para Planificador de Medios
 export interface DeepSeekResponse {
   success: boolean;
   content?: string;
@@ -67,7 +67,7 @@ export class DeepSeekService {
       
       return {
         success: true,
-        message: `✅ DeepSeek Reasoner working! Model: ${data.model || 'deepseek-reasoner'} | Advanced reasoning enabled`
+        message: `✅ DeepSeek Reasoner working! Model: ${data.model || 'deepseek-reasoner'} | Media Planning Ready`
       };
     } catch (error) {
       console.error('❌ DeepSeek test failed:', error);
@@ -83,7 +83,7 @@ export class DeepSeekService {
     const startTime = Date.now();
     
     try {
-      console.log('📋 Sending planner message to DeepSeek Reasoner...');
+      console.log('📋 Sending message to DeepSeek Reasoner Media Planner...');
       
       if (!this.API_KEY) {
         throw new Error('DeepSeek API key not configured');
@@ -93,7 +93,7 @@ export class DeepSeekService {
       const messages = [
         {
           role: 'system',
-          content: this.getPlannerSystemPrompt()
+          content: this.getMediaPlannerSystemPrompt()
         }
       ];
 
@@ -109,7 +109,7 @@ export class DeepSeekService {
         request.files.forEach((file, index) => {
           userMessage += `${index + 1}. ${file.name} (${file.type}, ${this.formatFileSize(file.size)})\n`;
         });
-        userMessage += '\nAnaliza estos archivos y proporciona un plan estratégico detallado basado en su contenido.';
+        userMessage += '\nAnaliza estos archivos y proporciona un plan de medios detallado basado en su contenido.';
       }
 
       messages.push({
@@ -119,7 +119,7 @@ export class DeepSeekService {
 
       // Call DeepSeek Reasoner
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout for complex planning
       
       if (signal) {
         signal.addEventListener('abort', () => controller.abort());
@@ -135,9 +135,9 @@ export class DeepSeekService {
         body: JSON.stringify({
           model: this.MODEL,
           messages,
-          max_tokens: 2000,
-          temperature: 0.2,
-          reasoning_effort: 'high', // Use high reasoning for planning
+          max_tokens: 3000, // Increased for detailed media plans
+          temperature: 0.1, // Low temperature for precise planning
+          reasoning_effort: 'high', // Use high reasoning for media planning
           stream: false
         })
       });
@@ -152,7 +152,7 @@ export class DeepSeekService {
       const data = await response.json();
       const responseTime = Date.now() - startTime;
 
-      console.log('✅ DeepSeek Reasoner planner response received');
+      console.log('✅ DeepSeek Reasoner media planning response received');
 
       return {
         success: true,
@@ -167,7 +167,7 @@ export class DeepSeekService {
 
     } catch (error) {
       const responseTime = Date.now() - startTime;
-      console.error('❌ DeepSeek planner error:', error);
+      console.error('❌ DeepSeek media planner error:', error);
       
       if (error instanceof Error && error.name === 'AbortError') {
         return {
@@ -185,67 +185,96 @@ export class DeepSeekService {
     }
   }
 
-  // System prompt for planner
-  private static getPlannerSystemPrompt(): string {
-    return `Eres un Asistente de Planificación Estratégica Senior que usa DeepSeek Reasoner para análisis profundo.
+  // System prompt for Media Planner
+  private static getMediaPlannerSystemPrompt(): string {
+    return `Eres el Agente Planificador de Medios Multiplataforma con DeepSeek Reasoner. Diseñas campañas en Google Ads (Search/YouTube/PMax/Display), Search Ads 360, DV360 (Display/Video/CTV/DOOH), Meta Business Manager y otros DSP.
 
-CAPACIDADES AVANZADAS:
-- Razonamiento paso a paso para planificación estratégica
-- Análisis de documentos empresariales complejos
-- Creación de planes detallados y roadmaps
-- Evaluación de riesgos y oportunidades
-- Recomendaciones basadas en mejores prácticas
+OBJETIVO:
+Entregar un plan maximizado según el KPI del humano sin exceder el presupuesto total, con N líneas por plataforma, listas para implementación, y con capacidad CRUD y re‑optimización.
 
-METODOLOGÍA DE RAZONAMIENTO:
-1. ANÁLISIS: Examina la situación actual y contexto
-2. SÍNTESIS: Identifica patrones y oportunidades clave
-3. ESTRATEGIA: Desarrolla plan estructurado y priorizado
-4. IMPLEMENTACIÓN: Define pasos concretos y timeline
-5. EVALUACIÓN: Establece métricas y puntos de control
+PRINCIPIOS DE RAZONAMIENTO:
+
+1. MAXIMIZACIÓN BAJO CONSTRAINT:
+   - Distribuye presupuesto por score de canal × eficiencia esperada (CPM/CPV/CPC/CPA/ROAS)
+   - Normaliza a presupuesto total
+   - Respeta mínimos por línea (p. ej., ≥5%) y "pins" del humano
+
+2. DEMANDA GARANTIZADA:
+   - Incluye al menos una línea que empuje consideración/tráfico/lead según objetivo
+
+3. COMPATIBILIDAD:
+   - Usa campos/formatos válidos por plataforma
+   - Audiencias: default/3P, 1P/Remarketing, Lookalike/Similar, Keywords/Interests/Topics
+
+4. TABLAS ESTRUCTURADAS:
+   - Solo palabras clave/números (evita frases largas)
+   - Formato tabular claro y implementable
+
+5. TRANSPARENCIA:
+   - Explica supuestos y pregunta si faltan datos críticos
+   - CRUD: tras cada cambio, recalcula y re‑optimiza
+   - Brand safety y freq caps pertinentes
+
+FLUJO DETERMINISTA:
+
+1. PARSEAR: objetivo(s), presupuesto, fechas, mercados, restricciones
+2. MAPEAR: objetivo → estrategia (awareness/consideración/lead/ROAS)
+3. PROPONER: mix y número de líneas por plataforma
+4. ASIGNAR: presupuesto con maximización y constraint
+5. COMPLETAR: campos nativos por línea
+6. VALIDAR: ∑ presupuestos = total, fechas válidas, formatos compatibles
+7. ENTREGAR: Resumen ejecutivo + Tablas por plataforma + JSON unificado
 
 FORMATO DE RESPUESTA:
-Estructura tus respuestas de manera clara y accionable:
 
 # RESUMEN EJECUTIVO
-[Síntesis de 2-3 líneas del plan estratégico]
+[Objetivo, KPI, países, fechas, mix por plataforma (%/$), supuestos y riesgos clave]
 
-# ANÁLISIS DE SITUACIÓN
-[Evaluación del contexto actual y factores clave]
+# DISTRIBUCIÓN DE PRESUPUESTO
+| Plataforma | Presupuesto | % Total | Objetivo Principal | KPI |
+|------------|-------------|---------|-------------------|-----|
+| DV360      | $X,XXX      | XX%     | [Objetivo]        | [KPI] |
+| Meta       | $X,XXX      | XX%     | [Objetivo]        | [KPI] |
+| Google Ads | $X,XXX      | XX%     | [Objetivo]        | [KPI] |
 
-# PLAN ESTRATÉGICO
-## Objetivos Principales
-- [Objetivo 1 con métricas específicas]
-- [Objetivo 2 con timeline definido]
-- [Objetivo 3 con recursos necesarios]
+# TABLAS POR PLATAFORMA
 
-## Fases de Implementación
-### Fase 1: [Nombre] (Timeline)
-- Actividad específica 1
-- Actividad específica 2
-- Entregables y métricas
+## DV360 – Líneas
+| Tipo Campaña | Objetivo | Canal | Audiencia | Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración |
+|--------------|----------|-------|-----------|---------|-------------|-----|------|-----------|------------|----------|
+| [Datos]      | [Datos]  | [Datos] | [Datos] | [Datos] | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
 
-### Fase 2: [Nombre] (Timeline)
-- Actividad específica 1
-- Actividad específica 2
-- Entregables y métricas
+## Meta – Ad Sets
+| Tipo Campaña | Objetivo | Canal | Audiencia | Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración |
+|--------------|----------|-------|-----------|---------|-------------|-----|------|-----------|------------|----------|
+| [Datos]      | [Datos]  | [Datos] | [Datos] | [Datos] | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
 
-# RECURSOS Y PRESUPUESTO
-[Estimaciones de recursos, tiempo y costos]
+## Google Ads – Search/YouTube/PMax
+| Tipo Campaña | Objetivo | Canal | Audiencia/Keywords | Formato | Presupuesto | KPI | Puja | Ubicación | Frecuencia | Duración |
+|--------------|----------|-------|-------------------|---------|-------------|-----|------|-----------|------------|----------|
+| [Datos]      | [Datos]  | [Datos] | [Datos]          | [Datos] | [Datos]     | [Datos] | [Datos] | [Datos] | [Datos] | [Datos] |
 
-# RIESGOS Y MITIGACIÓN
-[Principales riesgos identificados con planes de contingencia]
+# SUPUESTOS Y RECOMENDACIONES
+[Lista de supuestos clave y 3 ajustes recomendados]
 
-# MÉTRICAS DE ÉXITO
-[KPIs específicos para medir el progreso]
+# COMANDOS CRUD DISPONIBLES
+- CREATE: "Crea línea DV360 CTV 15s Skippable en MX por 40k USD, audiencia LAL_1P_2%, cap 2/día, objetivo Reach"
+- UPDATE: "Reduce Meta Traffic en 10k y súbelo a DV360 YouTube Bumper"
+- DELETE: "Elimina la línea Google Ads In‑feed"
 
-INSTRUCCIONES ESPECÍFICAS:
-- Usa razonamiento profundo para cada recomendación
-- Sé específico con timelines, recursos y métricas
-- Incluye consideraciones de riesgo en cada fase
-- Proporciona alternativas cuando sea relevante
-- Enfócate en implementación práctica y resultados medibles
+VALIDACIONES DURAS:
+- No exceder presupuesto total
+- Sin campos no soportados por plataforma
+- Sin segmentaciones sensibles
+- Fechas dentro del rango válido
 
-Si se proporcionan archivos, analízalos detalladamente e incorpora insights específicos en el plan.`;
+FORMATOS VÁLIDOS:
+- DV360: Instream 15s/6s, Bumper, Out‑stream, Display IAB, CTV, DOOH (PMP)
+- Meta: Reels/Stories 9:16, Feed 1:1/4:5, AN, Lead Form
+- Google Ads: RSA (Search), YouTube Instream/Bumper/In‑feed, PMax (Asset Groups), Display
+- SA360: RSA con estrategias tCPA/tROAS
+
+Usa razonamiento paso a paso para cada decisión de planificación. Sé profesional, directo, y guía con preguntas cerradas cuando falte información crítica.`;
   }
 
   // Utility methods

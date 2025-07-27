@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { User, Bot, FileText, Image, File, CheckCircle } from 'lucide-react';
+import { User, Brain, FileText, Image, File, CheckCircle } from 'lucide-react';
 import { PlannerMessage } from '../../types/planner';
 
 interface PlannerMessageBubbleProps {
@@ -25,31 +25,97 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // Format content with better structure
+  // Enhanced content formatting for media planning
   const formatContent = (content: string) => {
-    // Split content into sections and format
+    // Split content into sections and format with better structure
     const sections = content.split('\n\n');
     return sections.map((section, index) => {
+      // Handle headers
       if (section.trim().startsWith('#')) {
-        return (
-          <h3 key={index} className="text-lg font-semibold text-gray-900 dark:text-white mb-2 mt-4">
-            {section.replace(/^#+\s*/, '')}
-          </h3>
-        );
-      } else if (section.includes('•') || section.includes('-')) {
+        const level = (section.match(/^#+/) || [''])[0].length;
+        const text = section.replace(/^#+\s*/, '');
+        
+        if (level === 1) {
+          return (
+            <h2 key={index} className="text-xl font-bold text-gray-900 dark:text-white mb-3 mt-6 border-b border-gray-200 dark:border-gray-700 pb-2">
+              {text}
+            </h2>
+          );
+        } else if (level === 2) {
+          return (
+            <h3 key={index} className="text-lg font-semibold text-gray-900 dark:text-white mb-2 mt-4">
+              {text}
+            </h3>
+          );
+        } else {
+          return (
+            <h4 key={index} className="text-md font-medium text-gray-900 dark:text-white mb-2 mt-3">
+              {text}
+            </h4>
+          );
+        }
+      }
+      
+      // Handle tables (markdown format)
+      else if (section.includes('|') && section.includes('---')) {
+        const lines = section.split('\n').filter(line => line.trim());
+        const headerLine = lines[0];
+        const separatorLine = lines[1];
+        const dataLines = lines.slice(2);
+        
+        if (headerLine && separatorLine && separatorLine.includes('---')) {
+          const headers = headerLine.split('|').map(h => h.trim()).filter(h => h);
+          const rows = dataLines.map(line => 
+            line.split('|').map(cell => cell.trim()).filter(cell => cell)
+          );
+          
+          return (
+            <div key={index} className="mb-6 overflow-x-auto">
+              <table className="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg">
+                <thead className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+                  <tr>
+                    {headers.map((header, headerIndex) => (
+                      <th key={headerIndex} className="px-3 py-2 text-left text-xs font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-900">
+                  {rows.map((row, rowIndex) => (
+                    <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}>
+                      {row.map((cell, cellIndex) => (
+                        <td key={cellIndex} className="px-3 py-2 text-xs text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+      }
+      
+      // Handle bullet lists
+      else if (section.includes('•') || section.includes('-')) {
         const items = section.split('\n').filter(line => line.trim());
         return (
-          <ul key={index} className="list-disc list-inside space-y-1 mb-4">
+          <ul key={index} className="list-disc list-inside space-y-1 mb-4 ml-4">
             {items.map((item, itemIndex) => (
-              <li key={itemIndex} className="text-gray-700 dark:text-gray-300">
+              <li key={itemIndex} className="text-gray-700 dark:text-gray-300 text-sm">
                 {item.replace(/^[•\-]\s*/, '')}
               </li>
             ))}
           </ul>
         );
-      } else {
+      }
+      
+      // Handle regular paragraphs
+      else {
         return (
-          <p key={index} className="text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">
+          <p key={index} className="text-gray-700 dark:text-gray-300 mb-3 leading-relaxed text-sm">
             {section}
           </p>
         );
@@ -67,14 +133,14 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
         <div className="max-w-3xl bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-2xl rounded-br-md shadow-lg">
           <div className="flex items-start gap-3">
             <div className="flex-1">
-              <p className="whitespace-pre-wrap">{message.content}</p>
+              <p className="whitespace-pre-wrap text-sm">{message.content}</p>
               
-              {/* Enhanced Attachments Display for Planner */}
+              {/* Enhanced Attachments Display for Media Planner */}
               {message.attachments && message.attachments.length > 0 && (
                 <div className="mt-4 space-y-2">
                   <div className="text-sm text-blue-100 font-medium flex items-center gap-2">
                     <FileText size={16} />
-                    📋 Documentos para Planificación ({message.attachments.length}):
+                    📊 Documentos para Planificación de Medios ({message.attachments.length}):
                   </div>
                   {message.attachments.map((attachment) => (
                     <div
@@ -100,7 +166,7 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
                     </div>
                   ))}
                   <div className="text-xs text-blue-100 italic bg-white/5 p-2 rounded border border-white/10">
-                    ✅ Documentos analizados por DeepSeek Reasoner
+                    ✅ Documentos analizados por DeepSeek Reasoner para planificación de medios
                   </div>
                 </div>
               )}
@@ -125,14 +191,14 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
           {/* Assistant Header */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 flex items-center gap-3">
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white">
-              <span className="text-lg">🧠</span>
+              <Brain size={16} />
             </div>
             <div className="flex-1">
               <h3 className="font-medium text-white text-sm">
-                Asistente de Planificación (DeepSeek Reasoner)
+                Planificador de Medios Multiplataforma
               </h3>
               <p className="text-white/80 text-xs">
-                Especialista en planificación estratégica con razonamiento avanzado
+                DeepSeek Reasoner • Google Ads • DV360 • Meta • SA360 • DSPs
               </p>
             </div>
             <div className="flex items-center gap-1">
@@ -153,15 +219,14 @@ export const PlannerMessageBubble: React.FC<PlannerMessageBubbleProps> = ({ mess
                 <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
                   <FileText size={16} />
                   <span className="text-sm font-medium">
-                    Análisis de Documentos Completado
+                    Análisis de Documentos para Planificación de Medios
                   </span>
                 </div>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                  Esta respuesta incluye análisis detallado de {message.attachments.length} documento{message.attachments.length > 1 ? 's' : ''} procesado{message.attachments.length > 1 ? 's' : ''} por DeepSeek Reasoner
+                  Plan de medios generado con análisis de {message.attachments.length} documento{message.attachments.length > 1 ? 's' : ''} usando DeepSeek Reasoner
                 </p>
               </div>
             )}
-
           </div>
         </div>
       </div>

@@ -31,10 +31,10 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading }) =
               <span className="text-2xl">📋</span>
             </div>
             <h2 className="text-xl font-medium text-gray-900 dark:text-white mb-3">
-              ¿Cómo puedo ayudarte a planificar?
+              Planificador de Medios Multiplataforma
             </h2>
             <p className="text-gray-600 dark:text-gray-400 max-w-md leading-relaxed">
-              Soy tu asistente de planificación estratégica con DeepSeek Reasoner. Puedes subir documentos y te ayudo a crear planes detallados con razonamiento avanzado.
+              Especialista en Google Ads, DV360, Meta, SA360 y DSPs. Diseño campañas optimizadas con DeepSeek Reasoner para maximizar tu KPI dentro del presupuesto.
             </p>
           </div>
         ) : (
@@ -48,7 +48,7 @@ export const PlannerArea: React.FC<PlannerAreaProps> = ({ messages, loading }) =
                   <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
                     <div className="animate-spin w-4 h-4 border-2 border-blue-300 border-t-blue-600 dark:border-blue-600 dark:border-t-blue-300 rounded-full" />
                     <span className="text-sm">
-                      DeepSeek Reasoner analizando y planificando...
+                      DeepSeek Reasoner creando plan de medios optimizado...
                     </span>
                   </div>
                 </div>
