@@ -421,6 +421,7 @@ export const Dashboard: React.FC = () => {
       setAbortController(null);
     }
   };
+  };
 
   const handleStop = async () => {
     if (abortController) {
